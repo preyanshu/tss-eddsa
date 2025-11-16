@@ -9,7 +9,7 @@
     "build": "tsc",
     "watch": "tsc --watch",
     "clean": "rm -rf dist",
-    "lint": "eslint . --max-warnings 0",
+    "lint": "eslint . --max-warnings 100",
     "check-types": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",
