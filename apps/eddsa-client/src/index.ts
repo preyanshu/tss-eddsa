@@ -18,3 +18,4 @@ export { CoordinatorService } from "./services/coordinator_service";
 export { MPCClient } from "./client/mpc_client";
 export * from "./types";
 export * from "./errors";
+export * from "./utils/validation";

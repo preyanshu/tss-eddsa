@@ -13,9 +13,7 @@
     "check-types": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "example:mpc": "ts-node examples/complete_mpc_protocol.ts",
-    "example:solana": "ts-node examples/solana_transaction_poc.ts"
+    "test:coverage": "jest --coverage"
   },
   "exports": {
     ".": {

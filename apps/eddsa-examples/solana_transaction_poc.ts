@@ -22,7 +22,7 @@
  *   signingParties (default: party-0,party-1) - Comma-separated party IDs to sign
  */
 
-import { MPCService, CoordinatorService } from "../dist/index";
+import { MPCService, CoordinatorService } from "multi-party-eddsa";
 import {
   Connection,
   Keypair,

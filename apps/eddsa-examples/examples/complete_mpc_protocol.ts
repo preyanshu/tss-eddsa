@@ -32,12 +32,13 @@
  *   signingParties (default: party-0,party-1) - Comma-separated party IDs to sign
  */
 
-import { MPCService, CoordinatorService } from "../dist/index";
-import { SignatureResult } from "../src/types";
 import {
+  MPCService,
+  CoordinatorService,
+  SignatureResult,
   validateThreshold,
   validateSigningParties,
-} from "../src/utils/validation";
+} from "multi-party-eddsa";
 
 /**
  * Run the complete MPC protocol demonstration
@@ -143,7 +144,11 @@ export async function runCompleteMPCProtocol(
     console.log(
       `  [${partyId}] POST http://coordinator-server:3000/api/keygen/register`,
     );
-    partyInits[partyId] = services[partyId].register();
+    const service = services[partyId];
+    if (!service) {
+      throw new Error(`Service not found for party ${partyId}`);
+    }
+    partyInits[partyId] = service.register();
     coordinator.registerParty(partyId, partyInits[partyId].publicKey);
     const partyIndex = (coordinator as any).parties.findIndex(
       (p: any) => p.partyId === partyId,
@@ -166,7 +171,11 @@ export async function runCompleteMPCProtocol(
   }> = [];
   for (const partyId of allPartyIds) {
     console.log(`  [${partyId}] POST /api/mpc/keygen/commitment`);
-    const commit = services[partyId].generateCommitment();
+    const service = services[partyId];
+    if (!service) {
+      throw new Error(`Service not found for party ${partyId}`);
+    }
+    const commit = service.generateCommitment();
     partyCommitments.push({ partyId, ...commit });
   }
 
@@ -182,17 +191,28 @@ export async function runCompleteMPCProtocol(
     [];
   for (let i = 0; i < allPartyIds.length; i++) {
     const partyId = allPartyIds[i];
+    if (!partyId) {
+      throw new Error(`Party ID at index ${i} is undefined`);
+    }
+    const service = services[partyId];
+    if (!service) {
+      throw new Error(`Service not found for party ${partyId}`);
+    }
     console.log(`  [${partyId}] POST /api/mpc/keygen/distribute`);
+    const partyIndex = commitData.parties[i];
+    if (partyIndex === undefined) {
+      throw new Error(`Party index at position ${i} is undefined`);
+    }
     console.log(
-      `    Body: { threshold: ${commitData.threshold}, shareCount: ${commitData.shareCount}, partyIndex: ${commitData.parties[i]} }`,
+      `    Body: { threshold: ${commitData.threshold}, shareCount: ${commitData.shareCount}, partyIndex: ${partyIndex} }`,
     );
-    const shares = services[partyId].distributeShares(
+    const shares = service.distributeShares(
       commitData.threshold,
       commitData.shareCount,
       commitData.blindFactors,
       commitData.publicKeys,
       commitData.commitments,
-      commitData.parties[i],
+      partyIndex,
     );
     partyShares.push({ partyId, ...shares });
   }
@@ -210,13 +230,21 @@ export async function runCompleteMPCProtocol(
   const partySharedKeys: Array<{ partyId: string; sharedKey: any }> = [];
   for (const partyId of allPartyIds) {
     console.log(`  [${partyId}] POST /api/mpc/keygen/construct`);
-    const keyResult = services[partyId].constructKeypair(
-      shareData[partyId].threshold,
-      shareData[partyId].shareCount,
-      shareData[partyId].publicKeys,
-      shareData[partyId].allSecretShares,
-      shareData[partyId].allVssSchemes,
-      shareData[partyId].partyIndex,
+    const service = services[partyId];
+    if (!service) {
+      throw new Error(`Service not found for party ${partyId}`);
+    }
+    const data = shareData[partyId];
+    if (!data) {
+      throw new Error(`Share data not found for party ${partyId}`);
+    }
+    const keyResult = service.constructKeypair(
+      data.threshold,
+      data.shareCount,
+      data.publicKeys,
+      data.allSecretShares,
+      data.allVssSchemes,
+      data.partyIndex,
     );
     partySharedKeys.push({ partyId, sharedKey: keyResult.sharedKey });
   }
@@ -277,10 +305,21 @@ export async function runCompleteMPCProtocol(
   }> = [];
   for (let i = 0; i < signingParties.length; i++) {
     const partyId = signingParties[i];
+    if (!partyId) {
+      throw new Error(`Signing party at index ${i} is undefined`);
+    }
+    const service = services[partyId];
+    if (!service) {
+      throw new Error(`Service not found for party ${partyId}`);
+    }
+    const signingPartyIndex = signingSession.signingParties[i];
+    if (signingPartyIndex === undefined) {
+      throw new Error(`Signing party index at position ${i} is undefined`);
+    }
     console.log(`  [${partyId}] POST /api/mpc/sign/ephemeral-key`);
-    const eph = services[partyId].startEphemeralKeyGeneration(
+    const eph = service.startEphemeralKeyGeneration(
       message,
-      signingSession.signingParties[i],
+      signingPartyIndex,
     );
     partyEphData.push({ partyId, ...eph });
   }
@@ -303,9 +342,19 @@ export async function runCompleteMPCProtocol(
   }> = [];
   for (let i = 0; i < signingParties.length; i++) {
     const partyId = signingParties[i];
+    if (!partyId) {
+      throw new Error(`Signing party at index ${i} is undefined`);
+    }
+    const service = services[partyId];
+    if (!service) {
+      throw new Error(`Service not found for party ${partyId}`);
+    }
     const eph = partyEphData[i];
+    if (!eph) {
+      throw new Error(`Ephemeral data at index ${i} is undefined`);
+    }
     console.log(`  [${partyId}] POST /api/mpc/sign/distribute-ephemeral`);
-    const shares = services[partyId].distributeEphemeralShares(
+    const shares = service.distributeEphemeralShares(
       eph.ephKeyId,
       signingThreshold,
       signingShareCount,
@@ -325,16 +374,30 @@ export async function runCompleteMPCProtocol(
   const ephSharedKeys: any[] = [];
   for (let i = 0; i < signingParties.length; i++) {
     const partyId = signingParties[i];
+    if (!partyId) {
+      throw new Error(`Signing party at index ${i} is undefined`);
+    }
+    const service = services[partyId];
+    if (!service) {
+      throw new Error(`Service not found for party ${partyId}`);
+    }
     const eph = partyEphData[i];
+    if (!eph) {
+      throw new Error(`Ephemeral data at index ${i} is undefined`);
+    }
+    const ephData = ephShareData[partyId];
+    if (!ephData) {
+      throw new Error(`Ephemeral share data not found for party ${partyId}`);
+    }
     console.log(`  [${partyId}] POST /api/mpc/sign/construct-ephemeral`);
-    const ephResult = services[partyId].constructEphemeralKeypair(
+    const ephResult = service.constructEphemeralKeypair(
       eph.ephKeyId,
       signingThreshold,
       signingShareCount,
       ephCommitData.ephRPoints,
-      ephShareData[partyId].allEphSecretShares,
-      ephShareData[partyId].allEphVssSchemes,
-      ephShareData[partyId].partyIndex,
+      ephData.allEphSecretShares,
+      ephData.allEphVssSchemes,
+      ephData.partyIndex,
       signingSession.signingParties,
     );
     ephSharedKeys.push(ephResult.ephSharedKey);
@@ -342,9 +405,24 @@ export async function runCompleteMPCProtocol(
 
   // Set coordinator state for ephemeral keys
   (coordinator as any).ephSharedKeys = ephSharedKeys;
-  (coordinator as any).allEphVssSchemes =
-    ephShareData[signingParties[0]].allEphVssSchemes;
-  (coordinator as any).allVssSchemes = shareData[allPartyIds[0]].allVssSchemes;
+  const firstSigningParty = signingParties[0];
+  if (!firstSigningParty) {
+    throw new Error("No signing parties available");
+  }
+  const firstEphData = ephShareData[firstSigningParty];
+  if (!firstEphData) {
+    throw new Error(`Ephemeral share data not found for party ${firstSigningParty}`);
+  }
+  (coordinator as any).allEphVssSchemes = firstEphData.allEphVssSchemes;
+  const firstPartyId = allPartyIds[0];
+  if (!firstPartyId) {
+    throw new Error("No party IDs available");
+  }
+  const firstShareData = shareData[firstPartyId];
+  if (!firstShareData) {
+    throw new Error(`Share data not found for party ${firstPartyId}`);
+  }
+  (coordinator as any).allVssSchemes = firstShareData.allVssSchemes;
   (coordinator as any).signingPartyIndices = signingSession.signingParties;
 
   console.log("  ✓ Ephemeral keypairs constructed\n");
@@ -356,10 +434,21 @@ export async function runCompleteMPCProtocol(
   const partyLocalSigs: Array<{ partyId: string; localSig: any }> = [];
   for (let i = 0; i < signingParties.length; i++) {
     const partyId = signingParties[i];
+    if (!partyId) {
+      throw new Error(`Signing party at index ${i} is undefined`);
+    }
+    const service = services[partyId];
+    if (!service) {
+      throw new Error(`Service not found for party ${partyId}`);
+    }
+    const ephKey = ephSharedKeys[i];
+    if (!ephKey) {
+      throw new Error(`Ephemeral shared key at index ${i} is undefined`);
+    }
     console.log(`  [${partyId}] POST /api/mpc/sign/compute-local`);
-    const localSigResult = services[partyId].computeLocalSignature(
+    const localSigResult = service.computeLocalSignature(
       message,
-      ephSharedKeys[i],
+      ephKey,
     );
     partyLocalSigs.push({ partyId, localSig: localSigResult.localSig });
   }

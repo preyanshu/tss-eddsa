@@ -32,6 +32,9 @@ dist
 **/*.rs.bk
 **/Cargo.lock
 
+# Native bindings
+**/*.node
+
 # Test artifacts
 **/test-ledger/
 **/coverage/

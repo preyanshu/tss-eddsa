@@ -1,0 +1,20 @@
+{
+  "name": "eddsa-examples",
+  "version": "1.0.0",
+  "description": "Example implementations for Multi-Party EdDSA library",
+  "scripts": {
+    "example:mpc": "ts-node examples/complete_mpc_protocol.ts",
+    "example:solana": "ts-node examples/solana_transaction_poc.ts"
+  },
+  "dependencies": {
+    "@solana/web3.js": "^1.98.4",
+    "multi-party-eddsa": "workspace:*"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "*",
+    "@types/node": "^24.10.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
+
