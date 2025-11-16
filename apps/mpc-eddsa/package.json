@@ -1,0 +1,58 @@
+{
+  "name": "multi-party-eddsa",
+  "version": "1.0.0",
+  "description": "Multi-Party EdDSA threshold signature library",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "commonjs",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "clean": "rm -rf dist",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "example:mpc": "ts-node examples/complete_mpc_protocol.ts",
+    "example:solana": "ts-node examples/solana_transaction_poc.ts"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./MPCService": {
+      "types": "./dist/mpc_service.d.ts",
+      "default": "./dist/mpc_service.js"
+    },
+    "./CoordinatorService": {
+      "types": "./dist/coordinator_service.d.ts",
+      "default": "./dist/coordinator_service.js"
+    },
+    "./MPCClient": {
+      "types": "./dist/mpc_client.d.ts",
+      "default": "./dist/mpc_client.js"
+    }
+  },
+  "keywords": [
+    "mpc",
+    "eddsa",
+    "threshold",
+    "signature",
+    "cryptography",
+    "multi-party"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@solana/web3.js": "^1.98.4"
+  },
+  "devDependencies": {
+    "@jest/globals": "^30.2.0",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.10.1",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.4.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "name": "multi-party-eddsa-node",
+  "version": "0.3.0",
+  "description": "Node.js bindings for multi-party EdDSA threshold signatures",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "build": "napi build --platform --release",
+    "build:debug": "napi build --platform",
+    "test": "node example.js"
+  },
+  "keywords": [
+    "eddsa",
+    "threshold",
+    "signatures",
+    "cryptography"
+  ],
+  "author": "Multi-party EdDSA Contributors",
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "@napi-rs/cli": "^2.0.0"
+  },
+  "napi": {
+    "name": "multi-party-eddsa-node",
+    "triples": {
+      "defaults": true,
+      "additional": []
+    }
+  }
+}
+
