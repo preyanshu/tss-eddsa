@@ -1,4 +1,4 @@
-import * as thresholdSigModule from "../../node-bindings/index";
+import * as thresholdSigModule from "multi-party-eddsa-node";
 const thresholdSig = thresholdSigModule.threshold_sig;
 
 import { ValidationError } from "../errors";
