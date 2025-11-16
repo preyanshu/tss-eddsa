@@ -66,13 +66,13 @@ export interface Party {
 export interface KeyGenSession {
   threshold: number;
   totalParties: number;
-  phase: 'keygen';
+  phase: "keygen";
 }
 
 export interface SigningSession {
   message: Buffer;
   signingParties: string[];
-  phase: 'signing';
+  phase: "signing";
 }
 
 export interface KeyGenResult {
@@ -166,4 +166,3 @@ export interface EphemeralShareData {
     signingParties: number[];
   };
 }
-

@@ -28,12 +28,12 @@ npm install multi-party-eddsa
 ### Basic Usage
 
 ```javascript
-const { MPCService, CoordinatorService } = require('multi-party-eddsa');
+const { MPCService, CoordinatorService } = require("multi-party-eddsa");
 
 // Step 1: Initialize services for each party
-const party0 = new MPCService('party-0');
-const party1 = new MPCService('party-1');
-const party2 = new MPCService('party-2');
+const party0 = new MPCService("party-0");
+const party1 = new MPCService("party-1");
+const party2 = new MPCService("party-2");
 
 // Step 2: Create coordinator to orchestrate the protocol
 const coordinator = new CoordinatorService();
@@ -46,9 +46,9 @@ const init0 = party0.register();
 const init1 = party1.register();
 const init2 = party2.register();
 
-coordinator.registerParty('party-0', init0.publicKey);
-coordinator.registerParty('party-1', init1.publicKey);
-coordinator.registerParty('party-2', init2.publicKey);
+coordinator.registerParty("party-0", init0.publicKey);
+coordinator.registerParty("party-1", init1.publicKey);
+coordinator.registerParty("party-2", init2.publicKey);
 
 // Step 5: Generate commitments
 const commit0 = party0.generateCommitment();
@@ -56,9 +56,9 @@ const commit1 = party1.generateCommitment();
 const commit2 = party2.generateCommitment();
 
 const commitData = coordinator.collectCommitments([
-  { partyId: 'party-0', ...commit0 },
-  { partyId: 'party-1', ...commit1 },
-  { partyId: 'party-2', ...commit2 }
+  { partyId: "party-0", ...commit0 },
+  { partyId: "party-1", ...commit1 },
+  { partyId: "party-2", ...commit2 },
 ]);
 
 // Step 6: Distribute shares
@@ -72,13 +72,13 @@ const key1 = party1.constructKeypair(/* ... */);
 const key2 = party2.constructKeypair(/* ... */);
 
 const keygenResult = coordinator.collectSharedKeys([
-  { partyId: 'party-0', sharedKey: key0.sharedKey },
-  { partyId: 'party-1', sharedKey: key1.sharedKey },
-  { partyId: 'party-2', sharedKey: key2.sharedKey }
+  { partyId: "party-0", sharedKey: key0.sharedKey },
+  { partyId: "party-1", sharedKey: key1.sharedKey },
+  { partyId: "party-2", sharedKey: key2.sharedKey },
 ]);
 
 // Now you have an aggregate public key that can be used for signing
-console.log('Aggregate Public Key:', keygenResult.aggregatePublicKey);
+console.log("Aggregate Public Key:", keygenResult.aggregatePublicKey);
 ```
 
 ## Architecture
@@ -118,6 +118,7 @@ new MPCService(partyId: string)
 #### Methods
 
 ##### `register()`
+
 Registers the party and generates initial public key.
 
 ```typescript
@@ -126,6 +127,7 @@ const result = service.register();
 ```
 
 ##### `generateCommitment()`
+
 Generates a commitment for the key generation phase.
 
 ```typescript
@@ -134,6 +136,7 @@ const result = service.generateCommitment();
 ```
 
 ##### `distributeShares(threshold, shareCount, blindFactors, publicKeys, commitments, partyIndex)`
+
 Distributes secret shares to all parties.
 
 ```typescript
@@ -149,6 +152,7 @@ const result = service.distributeShares(
 ```
 
 ##### `constructKeypair(threshold, shareCount, publicKeys, allSecretShares, allVssSchemes, partyIndex)`
+
 Constructs the shared keypair from collected shares.
 
 ```typescript
@@ -164,6 +168,7 @@ const result = service.constructKeypair(
 ```
 
 ##### `startEphemeralKeyGeneration(message, partyIndex)`
+
 Starts ephemeral key generation for signing.
 
 ```typescript
@@ -175,6 +180,7 @@ const result = service.startEphemeralKeyGeneration(
 ```
 
 ##### `distributeEphemeralShares(ephKeyId, threshold, shareCount, ephBlindFactors, ephRPoints, ephCommitments, signingParties)`
+
 Distributes ephemeral shares for signing.
 
 ```typescript
@@ -191,6 +197,7 @@ const result = service.distributeEphemeralShares(
 ```
 
 ##### `constructEphemeralKeypair(ephKeyId, threshold, shareCount, ephRPoints, allEphSecretShares, allEphVssSchemes, partyIndex, signingParties)`
+
 Constructs ephemeral keypair for signing.
 
 ```typescript
@@ -208,6 +215,7 @@ const result = service.constructEphemeralKeypair(
 ```
 
 ##### `computeLocalSignature(message, ephSharedKey)`
+
 Computes local signature component.
 
 ```typescript
@@ -225,12 +233,13 @@ Service that orchestrates the MPC protocol.
 #### Constructor
 
 ```typescript
-new CoordinatorService()
+new CoordinatorService();
 ```
 
 #### Methods
 
 ##### `startKeyGeneration(threshold, totalParties)`
+
 Starts a key generation session.
 
 ```typescript
@@ -238,6 +247,7 @@ coordinator.startKeyGeneration(threshold: number, totalParties: number);
 ```
 
 ##### `registerParty(partyId, publicKey)`
+
 Registers a party in the key generation session.
 
 ```typescript
@@ -245,17 +255,23 @@ coordinator.registerParty(partyId: string, publicKey: PublicKey);
 ```
 
 ##### `collectCommitments(partyCommitments)`
+
 Collects commitments from all parties.
 
 ```typescript
 const result = coordinator.collectCommitments([
-  { partyId: string, commitment: SerializableBigInt, blindFactor: SerializableBigInt },
+  {
+    partyId: string,
+    commitment: SerializableBigInt,
+    blindFactor: SerializableBigInt,
+  },
   // ...
 ]);
 // Returns: { threshold, shareCount, blindFactors, publicKeys, commitments, parties }
 ```
 
 ##### `collectShares(partyShares)`
+
 Collects secret shares from all parties.
 
 ```typescript
@@ -267,6 +283,7 @@ const result = coordinator.collectShares([
 ```
 
 ##### `collectSharedKeys(partySharedKeys)`
+
 Collects shared keys and computes aggregate public key.
 
 ```typescript
@@ -278,6 +295,7 @@ const result = coordinator.collectSharedKeys([
 ```
 
 ##### `startSigning(message, signingParties)`
+
 Starts a signing session.
 
 ```typescript
@@ -289,17 +307,25 @@ const session = coordinator.startSigning(
 ```
 
 ##### `collectEphemeralKeysAndCommitments(partyEphData)`
+
 Collects ephemeral keys and commitments.
 
 ```typescript
 const result = coordinator.collectEphemeralKeysAndCommitments([
-  { partyId: string, ephR: SerializableBigInt, ephKeyId: string, commitment: SerializableBigInt, blindFactor: SerializableBigInt },
+  {
+    partyId: string,
+    ephR: SerializableBigInt,
+    ephKeyId: string,
+    commitment: SerializableBigInt,
+    blindFactor: SerializableBigInt,
+  },
   // ...
 ]);
 // Returns: { ephBlindFactors, ephRPoints, ephCommitments }
 ```
 
 ##### `collectEphemeralShares(partyEphShares)`
+
 Collects ephemeral shares.
 
 ```typescript
@@ -311,6 +337,7 @@ const result = coordinator.collectEphemeralShares([
 ```
 
 ##### `collectLocalSignatures(partyLocalSigs)`
+
 Collects local signatures and aggregates them.
 
 ```typescript
@@ -332,11 +359,13 @@ npm run example:mpc -- 2 3 party-0,party-1
 ```
 
 **Arguments:**
+
 - `threshold` (default: 2) - Minimum parties needed to sign
 - `totalParties` (default: 3) - Total number of parties
 - `signingParties` (default: party-0,party-1) - Comma-separated party IDs
 
 **What it shows:**
+
 - Party registration and key generation
 - Commitment and share distribution
 - Shared keypair construction
@@ -353,12 +382,14 @@ npm run example:solana -- 2 3 party-0,party-1
 ```
 
 **Prerequisites:**
+
 ```bash
 # Start Solana test validator
 solana-test-validator
 ```
 
 **What it shows:**
+
 - Complete MPC protocol execution
 - Converting MPC signatures to Solana's 64-byte format
 - Creating Solana transfer transactions
@@ -372,8 +403,8 @@ solana-test-validator
 Solana uses Ed25519 signatures in a 64-byte format: `R (32 bytes) + s (32 bytes)`
 
 ```typescript
-import { MPCService, CoordinatorService } from 'multi-party-eddsa';
-import { Transaction, PublicKey } from '@solana/web3.js';
+import { MPCService, CoordinatorService } from "multi-party-eddsa";
+import { Transaction, PublicKey } from "@solana/web3.js";
 
 // After getting MPC signature from coordinator.collectLocalSignatures()
 const mpcSignature = result.signature;
@@ -401,7 +432,7 @@ transaction.addSignature(senderPubkey, solanaSignature);
 
 ### General Limitations
 
-1. **Threshold Requirements**: 
+1. **Threshold Requirements**:
    - Minimum threshold is 2 (t ≥ 2)
    - Threshold cannot exceed total parties (t ≤ n)
    - At least `threshold` parties must participate in signing
@@ -447,7 +478,7 @@ transaction.addSignature(senderPubkey, solanaSignature);
 
 ### Workarounds and Best Practices
 
-1. **For Versioned Transactions**: 
+1. **For Versioned Transactions**:
    - Convert to legacy format before signing, or
    - Use a wrapper that converts versioned transactions to legacy format
 
@@ -522,6 +553,7 @@ nodejs/
 ## Contributing
 
 Contributions are welcome! Please ensure:
+
 - All tests pass
 - TypeScript compiles without errors
 - Code follows existing style conventions

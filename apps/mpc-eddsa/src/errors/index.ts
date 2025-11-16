@@ -57,4 +57,3 @@ export class StateError extends MPCError {
     super(message);
   }
 }
-

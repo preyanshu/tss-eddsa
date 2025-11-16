@@ -1,28 +1,28 @@
-import { CoordinatorService, MPCService } from '../dist/index';
-import { describe, it, expect, beforeEach } from '@jest/globals';
+import { CoordinatorService, MPCService } from "../dist/index";
+import { describe, it, expect, beforeEach } from "@jest/globals";
 
-describe('CoordinatorService', () => {
+describe("CoordinatorService", () => {
   let coordinator: CoordinatorService;
   let services: { [key: string]: MPCService };
 
   beforeEach(() => {
     coordinator = new CoordinatorService();
     services = {
-      'party-0': new MPCService('party-0'),
-      'party-1': new MPCService('party-1'),
-      'party-2': new MPCService('party-2'),
+      "party-0": new MPCService("party-0"),
+      "party-1": new MPCService("party-1"),
+      "party-2": new MPCService("party-2"),
     };
   });
 
-  describe('Key Generation', () => {
-    it('should start a key generation session', () => {
+  describe("Key Generation", () => {
+    it("should start a key generation session", () => {
       coordinator.startKeyGeneration(2, 3);
       expect(coordinator).toBeDefined();
     });
 
-    it('should register parties', () => {
+    it("should register parties", () => {
       coordinator.startKeyGeneration(2, 3);
-      
+
       for (const [partyId, service] of Object.entries(services)) {
         const init = service.register();
         coordinator.registerParty(partyId, init.publicKey);
@@ -32,10 +32,10 @@ describe('CoordinatorService', () => {
       expect(coordinator).toBeDefined();
     });
 
-    it('should complete full key generation protocol', async () => {
+    it("should complete full key generation protocol", async () => {
       const threshold = 2;
       const totalParties = 3;
-      const allPartyIds = ['party-0', 'party-1', 'party-2'];
+      const allPartyIds = ["party-0", "party-1", "party-2"];
 
       // Start session
       coordinator.startKeyGeneration(threshold, totalParties);
@@ -48,7 +48,11 @@ describe('CoordinatorService', () => {
       }
 
       // Get commitments
-      const partyCommitments: Array<{ partyId: string; commitment: any; blindFactor: any }> = [];
+      const partyCommitments: Array<{
+        partyId: string;
+        commitment: any;
+        blindFactor: any;
+      }> = [];
       for (const partyId of allPartyIds) {
         const commit = services[partyId].generateCommitment();
         partyCommitments.push({
@@ -60,7 +64,11 @@ describe('CoordinatorService', () => {
       const commitData = coordinator.collectCommitments(partyCommitments);
 
       // Distribute shares
-      const partyShares: Array<{ partyId: string; vss: any; secretShares: any[] }> = [];
+      const partyShares: Array<{
+        partyId: string;
+        vss: any;
+        secretShares: any[];
+      }> = [];
       for (let i = 0; i < allPartyIds.length; i++) {
         const partyId = allPartyIds[i];
         const shares = services[partyId].distributeShares(
@@ -69,7 +77,7 @@ describe('CoordinatorService', () => {
           commitData.blindFactors,
           commitData.publicKeys,
           commitData.commitments,
-          commitData.parties[i]
+          commitData.parties[i],
         );
         partyShares.push({ partyId, ...shares });
       }
@@ -84,7 +92,7 @@ describe('CoordinatorService', () => {
           shareData[partyId].publicKeys,
           shareData[partyId].allSecretShares,
           shareData[partyId].allVssSchemes,
-          shareData[partyId].partyIndex
+          shareData[partyId].partyIndex,
         );
         sharedKeys.push(keyResult.sharedKey);
       }
@@ -95,4 +103,3 @@ describe('CoordinatorService', () => {
     });
   });
 });
-

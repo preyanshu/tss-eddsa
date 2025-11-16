@@ -1,14 +1,14 @@
-import { MPCService, CoordinatorService } from '../dist/index';
-import { describe, it, expect } from '@jest/globals';
+import { MPCService, CoordinatorService } from "../dist/index";
+import { describe, it, expect } from "@jest/globals";
 
-describe('MPC Integration Tests', () => {
-  describe('Full MPC Protocol - 2-of-3 Threshold', () => {
-    it('should complete key generation and signing with 2-of-3 threshold', async () => {
+describe("MPC Integration Tests", () => {
+  describe("Full MPC Protocol - 2-of-3 Threshold", () => {
+    it("should complete key generation and signing with 2-of-3 threshold", async () => {
       const threshold = 2;
       const totalParties = 3;
-      const signingParties = ['party-0', 'party-1'];
-      const allPartyIds = ['party-0', 'party-1', 'party-2'];
-      const message = Buffer.from('test message for MPC signing');
+      const signingParties = ["party-0", "party-1"];
+      const allPartyIds = ["party-0", "party-1", "party-2"];
+      const message = Buffer.from("test message for MPC signing");
 
       // Setup services
       const services: { [key: string]: MPCService } = {};
@@ -30,7 +30,11 @@ describe('MPC Integration Tests', () => {
       }
 
       // Get commitments
-      const partyCommitments: Array<{ partyId: string; commitment: any; blindFactor: any }> = [];
+      const partyCommitments: Array<{
+        partyId: string;
+        commitment: any;
+        blindFactor: any;
+      }> = [];
       for (const partyId of allPartyIds) {
         const commit = services[partyId].generateCommitment();
         partyCommitments.push({
@@ -42,7 +46,11 @@ describe('MPC Integration Tests', () => {
       const commitData = coordinator.collectCommitments(partyCommitments);
 
       // Distribute shares
-      const partyShares: Array<{ partyId: string; vss: any; secretShares: any[] }> = [];
+      const partyShares: Array<{
+        partyId: string;
+        vss: any;
+        secretShares: any[];
+      }> = [];
       for (let i = 0; i < allPartyIds.length; i++) {
         const partyId = allPartyIds[i];
         const shares = services[partyId].distributeShares(
@@ -51,7 +59,7 @@ describe('MPC Integration Tests', () => {
           commitData.blindFactors,
           commitData.publicKeys,
           commitData.commitments,
-          commitData.parties[i]
+          commitData.parties[i],
         );
         partyShares.push({ partyId, ...shares });
       }
@@ -66,7 +74,7 @@ describe('MPC Integration Tests', () => {
           shareData[partyId].publicKeys,
           shareData[partyId].allSecretShares,
           shareData[partyId].allVssSchemes,
-          shareData[partyId].partyIndex
+          shareData[partyId].partyIndex,
         );
         partySharedKeys.push({ partyId, sharedKey: keyResult.sharedKey });
       }
@@ -82,18 +90,32 @@ describe('MPC Integration Tests', () => {
       const signingSession = coordinator.startSigning(message, signingParties);
 
       // Generate ephemeral keys and commitments
-      const partyEphData: Array<{ partyId: string; ephR: any; ephKeyId: string; commitment: any; blindFactor: any }> = [];
+      const partyEphData: Array<{
+        partyId: string;
+        ephR: any;
+        ephKeyId: string;
+        commitment: any;
+        blindFactor: any;
+      }> = [];
       for (let i = 0; i < signingParties.length; i++) {
         const partyId = signingParties[i];
-        const eph = services[partyId].startEphemeralKeyGeneration(message, signingSession.signingParties[i]);
+        const eph = services[partyId].startEphemeralKeyGeneration(
+          message,
+          signingSession.signingParties[i],
+        );
         partyEphData.push({ partyId, ...eph });
       }
-      const ephCommitData = coordinator.collectEphemeralKeysAndCommitments(partyEphData);
+      const ephCommitData =
+        coordinator.collectEphemeralKeysAndCommitments(partyEphData);
 
       // Distribute ephemeral shares
       const signingThreshold = threshold;
       const signingShareCount = signingParties.length;
-      const partyEphShares: Array<{ partyId: string; vss: any; secretShares: any[] }> = [];
+      const partyEphShares: Array<{
+        partyId: string;
+        vss: any;
+        secretShares: any[];
+      }> = [];
       for (let i = 0; i < signingParties.length; i++) {
         const partyId = signingParties[i];
         const eph = partyEphData[i];
@@ -104,7 +126,7 @@ describe('MPC Integration Tests', () => {
           ephCommitData.ephBlindFactors,
           ephCommitData.ephRPoints,
           ephCommitData.ephCommitments,
-          signingSession.signingParties
+          signingSession.signingParties,
         );
         partyEphShares.push({ partyId, ...shares });
       }
@@ -123,22 +145,27 @@ describe('MPC Integration Tests', () => {
           ephShareData[partyId].allEphSecretShares,
           ephShareData[partyId].allEphVssSchemes,
           ephShareData[partyId].partyIndex,
-          signingSession.signingParties
+          signingSession.signingParties,
         );
         ephSharedKeys.push(ephResult.ephSharedKey);
       }
-      
+
       // Set coordinator state for ephemeral keys
       (coordinator as any).ephSharedKeys = ephSharedKeys;
-      (coordinator as any).allEphVssSchemes = ephShareData[signingParties[0]].allEphVssSchemes;
-      (coordinator as any).allVssSchemes = shareData[allPartyIds[0]].allVssSchemes;
+      (coordinator as any).allEphVssSchemes =
+        ephShareData[signingParties[0]].allEphVssSchemes;
+      (coordinator as any).allVssSchemes =
+        shareData[allPartyIds[0]].allVssSchemes;
       (coordinator as any).signingPartyIndices = signingSession.signingParties;
 
       // Compute local signatures
       const partyLocalSigs: Array<{ partyId: string; localSig: any }> = [];
       for (let i = 0; i < signingParties.length; i++) {
         const partyId = signingParties[i];
-        const localSigResult = services[partyId].computeLocalSignature(message, ephSharedKeys[i]);
+        const localSigResult = services[partyId].computeLocalSignature(
+          message,
+          ephSharedKeys[i],
+        );
         partyLocalSigs.push({ partyId, localSig: localSigResult.localSig });
       }
 
@@ -153,17 +180,34 @@ describe('MPC Integration Tests', () => {
       expect(result.aggregatePublicKeyHex).toBeDefined();
     });
 
-    it('should handle different threshold configurations', async () => {
+    it("should handle different threshold configurations", async () => {
       const testCases = [
-        { threshold: 2, totalParties: 3, signingParties: ['party-0', 'party-1'] },
-        { threshold: 2, totalParties: 4, signingParties: ['party-0', 'party-1'] },
-        { threshold: 3, totalParties: 5, signingParties: ['party-0', 'party-1', 'party-2'] },
+        {
+          threshold: 2,
+          totalParties: 3,
+          signingParties: ["party-0", "party-1"],
+        },
+        {
+          threshold: 2,
+          totalParties: 4,
+          signingParties: ["party-0", "party-1"],
+        },
+        {
+          threshold: 3,
+          totalParties: 5,
+          signingParties: ["party-0", "party-1", "party-2"],
+        },
       ];
 
       for (const testCase of testCases) {
         const { threshold, totalParties, signingParties } = testCase;
-        const allPartyIds = Array.from({ length: totalParties }, (_, i) => `party-${i}`);
-        const message = Buffer.from(`test message for ${threshold}-of-${totalParties}`);
+        const allPartyIds = Array.from(
+          { length: totalParties },
+          (_, i) => `party-${i}`,
+        );
+        const message = Buffer.from(
+          `test message for ${threshold}-of-${totalParties}`,
+        );
 
         // Setup
         const services: { [key: string]: MPCService } = {};
@@ -179,7 +223,11 @@ describe('MPC Integration Tests', () => {
           coordinator.registerParty(partyId, init.publicKey);
         }
 
-        const partyCommitments: Array<{ partyId: string; commitment: any; blindFactor: any }> = [];
+        const partyCommitments: Array<{
+          partyId: string;
+          commitment: any;
+          blindFactor: any;
+        }> = [];
         for (const partyId of allPartyIds) {
           const commit = services[partyId].generateCommitment();
           partyCommitments.push({
@@ -190,7 +238,11 @@ describe('MPC Integration Tests', () => {
         }
         const commitData = coordinator.collectCommitments(partyCommitments);
 
-        const partyShares: Array<{ partyId: string; vss: any; secretShares: any[] }> = [];
+        const partyShares: Array<{
+          partyId: string;
+          vss: any;
+          secretShares: any[];
+        }> = [];
         for (let i = 0; i < allPartyIds.length; i++) {
           const partyId = allPartyIds[i];
           const shares = services[partyId].distributeShares(
@@ -199,7 +251,7 @@ describe('MPC Integration Tests', () => {
             commitData.blindFactors,
             commitData.publicKeys,
             commitData.commitments,
-            commitData.parties[i]
+            commitData.parties[i],
           );
           partyShares.push({ partyId, ...shares });
         }
@@ -213,26 +265,43 @@ describe('MPC Integration Tests', () => {
             shareData[partyId].publicKeys,
             shareData[partyId].allSecretShares,
             shareData[partyId].allVssSchemes,
-            shareData[partyId].partyIndex
+            shareData[partyId].partyIndex,
           );
           partySharedKeys.push({ partyId, sharedKey: keyResult.sharedKey });
         }
         coordinator.collectSharedKeys(partySharedKeys);
 
         // Signing
-        const signingSession = coordinator.startSigning(message, signingParties);
+        const signingSession = coordinator.startSigning(
+          message,
+          signingParties,
+        );
 
-        const partyEphData: Array<{ partyId: string; ephR: any; ephKeyId: string; commitment: any; blindFactor: any }> = [];
+        const partyEphData: Array<{
+          partyId: string;
+          ephR: any;
+          ephKeyId: string;
+          commitment: any;
+          blindFactor: any;
+        }> = [];
         for (let i = 0; i < signingParties.length; i++) {
           const partyId = signingParties[i];
-          const eph = services[partyId].startEphemeralKeyGeneration(message, signingSession.signingParties[i]);
+          const eph = services[partyId].startEphemeralKeyGeneration(
+            message,
+            signingSession.signingParties[i],
+          );
           partyEphData.push({ partyId, ...eph });
         }
-        const ephCommitData = coordinator.collectEphemeralKeysAndCommitments(partyEphData);
+        const ephCommitData =
+          coordinator.collectEphemeralKeysAndCommitments(partyEphData);
 
         const signingThreshold = threshold;
         const signingShareCount = signingParties.length;
-        const partyEphShares: Array<{ partyId: string; vss: any; secretShares: any[] }> = [];
+        const partyEphShares: Array<{
+          partyId: string;
+          vss: any;
+          secretShares: any[];
+        }> = [];
         for (let i = 0; i < signingParties.length; i++) {
           const partyId = signingParties[i];
           const eph = partyEphData[i];
@@ -243,7 +312,7 @@ describe('MPC Integration Tests', () => {
             ephCommitData.ephBlindFactors,
             ephCommitData.ephRPoints,
             ephCommitData.ephCommitments,
-            signingSession.signingParties
+            signingSession.signingParties,
           );
           partyEphShares.push({ partyId, ...shares });
         }
@@ -261,21 +330,27 @@ describe('MPC Integration Tests', () => {
             ephShareData[partyId].allEphSecretShares,
             ephShareData[partyId].allEphVssSchemes,
             ephShareData[partyId].partyIndex,
-            signingSession.signingParties
+            signingSession.signingParties,
           );
           ephSharedKeys.push(ephResult.ephSharedKey);
         }
-        
+
         // Set coordinator state for ephemeral keys
         (coordinator as any).ephSharedKeys = ephSharedKeys;
-        (coordinator as any).allEphVssSchemes = ephShareData[signingParties[0]].allEphVssSchemes;
-        (coordinator as any).allVssSchemes = shareData[allPartyIds[0]].allVssSchemes;
-        (coordinator as any).signingPartyIndices = signingSession.signingParties;
+        (coordinator as any).allEphVssSchemes =
+          ephShareData[signingParties[0]].allEphVssSchemes;
+        (coordinator as any).allVssSchemes =
+          shareData[allPartyIds[0]].allVssSchemes;
+        (coordinator as any).signingPartyIndices =
+          signingSession.signingParties;
 
         const partyLocalSigs: Array<{ partyId: string; localSig: any }> = [];
         for (let i = 0; i < signingParties.length; i++) {
           const partyId = signingParties[i];
-          const localSigResult = services[partyId].computeLocalSignature(message, ephSharedKeys[i]);
+          const localSigResult = services[partyId].computeLocalSignature(
+            message,
+            ephSharedKeys[i],
+          );
           partyLocalSigs.push({ partyId, localSig: localSigResult.localSig });
         }
 
@@ -288,4 +363,3 @@ describe('MPC Integration Tests', () => {
     });
   });
 });
-

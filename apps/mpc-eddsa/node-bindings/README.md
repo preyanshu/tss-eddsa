@@ -45,4 +45,3 @@ See `../nodejs/example.js` for a complete example of a 2-of-3 threshold signatur
 ## Types
 
 All cryptographic types (Point, Scalar, BigInt) are serialized as objects with a `bytes` field containing the byte representation.
-
