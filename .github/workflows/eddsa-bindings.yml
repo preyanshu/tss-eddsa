@@ -48,8 +48,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-          cache-dependency-path: ${{ env.BINDINGS_DIR }}/package-lock.json
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: '1.2.2'
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -63,10 +66,10 @@ jobs:
           cache-on-failure: true
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
 
       - name: Build native addon
-        run: npm run build -- --target ${{ matrix.target }}
+        run: bun run build -- --target ${{ matrix.target }}
 
       - name: Upload binary
         uses: actions/upload-artifact@v4
@@ -96,8 +99,13 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: '1.2.2'
+
       - name: Install dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
 
       - name: Scaffold npm platform packages
         run: npx napi create-npm-dir -t .
