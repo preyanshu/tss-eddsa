@@ -80,7 +80,7 @@ jobs:
         if: startsWith(matrix.os, 'windows')
         shell: pwsh
         run: |
-          $gmpVersion = "6.3.0"
+          $gmpVersion = "6.2.1"
           $zipUrl = "https://github.com/ShiftMediaProject/gmp/releases/download/v$gmpVersion/gmp-$gmpVersion-win64.zip"
           $zipPath = "$env:RUNNER_TEMP\gmp.zip"
           Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath
