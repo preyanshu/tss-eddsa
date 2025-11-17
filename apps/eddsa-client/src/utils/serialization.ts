@@ -16,7 +16,7 @@ import {
  * Rust bindings expect Array bytes, not Buffer
  */
 export function normalizeBytesForRust(
-  obj: SerializableBigInt | any,
+  obj: SerializableBigInt | any
 ): SerializableBigInt {
   if (!obj || obj.bytes === undefined) return obj;
   const bytes = Array.isArray(obj.bytes)
@@ -33,7 +33,7 @@ export function normalizeBytesForRust(
  * Used for internal storage in CoordinatorService
  */
 export function normalizeBytesToBuffer(
-  obj: SerializableBigInt | any,
+  obj: SerializableBigInt | any
 ): SerializableBigInt {
   if (!obj || obj.bytes === undefined) return obj;
   const bytes = Buffer.isBuffer(obj.bytes)
@@ -49,7 +49,7 @@ export function normalizeBytesToBuffer(
  * HTTP APIs use Array format for JSON serialization
  */
 export function serializeForHttp(
-  obj: SerializableBigInt | any,
+  obj: SerializableBigInt | any
 ): SerializableBigInt {
   if (!obj || obj.bytes === undefined) return obj;
   return {
@@ -88,7 +88,7 @@ export function serializeVss(vss: VSSScheme): VSSScheme {
   // Convert SerializableBigInt objects in commitments array
   if (serialized.commitments && Array.isArray(serialized.commitments)) {
     serialized.commitments = serialized.commitments.map((c) =>
-      serializeForHttp(c),
+      serializeForHttp(c)
     );
   }
 
@@ -117,7 +117,7 @@ export function normalize2DArrayForRust(arr: SecretShare[][]): SecretShare[][] {
  * Serialize 2D array for HTTP
  */
 export function serialize2DArrayForHttp(
-  arr: SecretShare[][],
+  arr: SecretShare[][]
 ): SerializableBigInt[][] {
   return arr.map((row) => row.map((item) => serializeForHttp(item)));
 }
@@ -127,7 +127,7 @@ export function serialize2DArrayForHttp(
  * Rust uses 'r', HTTP uses 'R'
  */
 export function normalizeEphSharedKey(
-  ephSharedKey: EphemeralSharedKey,
+  ephSharedKey: EphemeralSharedKey
 ): EphemeralSharedKey {
   return {
     r: normalizeBytesForRust(ephSharedKey.r || ephSharedKey.R),

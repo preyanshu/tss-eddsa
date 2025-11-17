@@ -5,6 +5,7 @@ Example implementations demonstrating how to use the Multi-Party EdDSA library f
 ## Overview
 
 This package contains complete, runnable examples that demonstrate:
+
 - Full MPC protocol flow (key generation and signing)
 - Solana transaction signing with MPC signatures
 - Best practices for using the library
@@ -115,9 +116,11 @@ A proof-of-concept demonstrating how to sign and send Solana transactions using 
 #### Prerequisites
 
 1. **Start Solana Test Validator**:
+
    ```bash
    solana-test-validator
    ```
+
    This starts a local Solana validator on `http://localhost:8899`.
 
 2. **Set Solana CLI Configuration** (if needed):
@@ -140,6 +143,7 @@ bun run example:solana -- 2 3 party-0,party-1
 #### Command-Line Arguments
 
 Same as the complete MPC protocol example:
+
 - `threshold` (default: 2)
 - `totalParties` (default: 3)
 - `signingParties` (default: "party-0,party-1")
@@ -231,6 +235,7 @@ bun run example:solana
 ```
 
 **What they do:**
+
 - Execute the complete MPC protocol flow
 - Demonstrate real-world usage patterns
 - Show proper error handling
@@ -271,25 +276,30 @@ Each example follows this pattern:
 ### Example Fails to Run
 
 **Problem**: Cannot find module `multi-party-eddsa`
+
 - **Solution**: Ensure dependencies are installed: `bun install` (from root)
 - **Solution**: Ensure `eddsa-client` is built: `bun run build --filter=eddsa-client`
 
 **Problem**: TypeScript compilation errors
+
 - **Solution**: Run type check: `bun run check-types` (from root)
 - **Solution**: Ensure all packages are built: `bun run build`
 
 ### Solana Example Issues
 
 **Problem**: Cannot connect to Solana network
+
 - **Solution**: Ensure `solana-test-validator` is running
 - **Solution**: Check that validator is on `http://localhost:8899`
 
 **Problem**: Transaction fails
+
 - **Solution**: Check that sender account has sufficient balance
 - **Solution**: Verify transaction format is correct (legacy, not versioned)
 - **Solution**: Check Solana validator logs for errors
 
 **Problem**: Airdrop fails
+
 - **Solution**: Ensure validator is running and accessible
 - **Solution**: Check network configuration
 

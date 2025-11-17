@@ -50,7 +50,7 @@ describe("MPCService", () => {
         [commitment1.blindFactor, commitment2.blindFactor],
         [init.publicKey, init.publicKey], // Using same key for testing
         [commitment1.commitment, commitment2.commitment],
-        0, // partyIndex
+        0 // partyIndex
       );
       expect(shares).toBeDefined();
       expect(shares.secretShares).toBeDefined();

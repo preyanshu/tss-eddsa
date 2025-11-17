@@ -5,6 +5,7 @@ Rust implementation of multi-party Ed25519 signature scheme, providing the core 
 ## Overview
 
 This is the core cryptographic library that implements:
+
 - **Threshold EdDSA Signatures**: Require `t` out of `n` parties to sign
 - **Distributed Key Generation (DKG)**: Secure key generation without a trusted dealer
 - **Verifiable Secret Sharing (VSS)**: Share distribution with verification
@@ -128,6 +129,7 @@ let broadcast = phase1_broadcast(&key_id)?;
 ## Dependencies
 
 Key dependencies:
+
 - **curve25519-dalek**: Ed25519 curve operations
 - **sha2**: SHA-256 hashing
 - **rand**: Random number generation
@@ -180,6 +182,7 @@ The contribution workflow is described in the main repository documentation.
 ## Contact
 
 For questions or contributions:
+
 - Open an issue on GitHub
 - Refer to the main repository README
 

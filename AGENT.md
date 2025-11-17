@@ -5,6 +5,7 @@ This document provides information for AI agents and automated tools working wit
 ## Repository Overview
 
 This is a **Turborepo monorepo** containing a Multi-Party EdDSA (Ed25519) threshold signature implementation. The repository uses:
+
 - **Bun** as the primary package manager (with npm/yarn/pnpm support)
 - **Turborepo** for task orchestration and caching
 - **TypeScript** for the client library
@@ -39,6 +40,7 @@ This is a **Turborepo monorepo** containing a Multi-Party EdDSA (Ed25519) thresh
 ### Package-Specific Files
 
 #### `eddsa-client/`
+
 - **`package.json`**: Client library package definition, scripts, dependencies
 - **`tsconfig.json`**: TypeScript configuration (extends shared config)
 - **`eslint.config.mjs`**: ESLint configuration (extends shared config)
@@ -49,6 +51,7 @@ This is a **Turborepo monorepo** containing a Multi-Party EdDSA (Ed25519) thresh
 - **`src/services/coordinator_service.ts`**: CoordinatorService implementation
 
 #### `eddsa-bindings/`
+
 - **`package.json`**: Bindings package definition, NAPI configuration
 - **`Cargo.toml`**: Rust package configuration, dependencies
 - **`src/lib.rs`**: NAPI-RS bindings code
@@ -57,11 +60,13 @@ This is a **Turborepo monorepo** containing a Multi-Party EdDSA (Ed25519) thresh
 - **`index.d.ts`**: Generated TypeScript definitions
 
 #### `eddsa-core/`
+
 - **`Cargo.toml`**: Rust package configuration
 - **`src/lib.rs`**: Library entry point
 - **`src/protocols/thresholdsig/`**: Threshold signature implementation
 
 #### `eddsa-examples/`
+
 - **`package.json`**: Examples package definition
 - **`examples/complete_mpc_protocol.ts`**: Full MPC protocol example
 - **`examples/solana_transaction_poc.ts`**: Solana transaction signing example
@@ -71,6 +76,7 @@ This is a **Turborepo monorepo** containing a Multi-Party EdDSA (Ed25519) thresh
 ### Task Dependencies (Turborepo)
 
 Tasks are defined in `turbo.json` with dependencies:
+
 - `build`: Depends on `^build` (build dependencies first)
 - `test`: Depends on `^build` (build before testing)
 - `lint`: Depends on `^lint` (lint dependencies first)
@@ -193,6 +199,7 @@ Each package has its own scripts (see individual `package.json` files):
 ### Build Artifacts
 
 **Never commit:**
+
 - `target/` directories (Rust build artifacts)
 - `*.node` files (native bindings)
 - `dist/` directories (TypeScript output)
@@ -204,6 +211,7 @@ These are all in `.gitignore` and should not be tracked.
 ### Git History
 
 The repository has been cleaned of large build artifacts from history. When committing:
+
 - Only commit source code and configuration files
 - Never commit build artifacts
 - Use clear, descriptive commit messages
@@ -255,12 +263,14 @@ The repository has been cleaned of large build artifacts from history. When comm
 ## Environment Variables
 
 Currently, no environment variables are required. For future development:
+
 - Consider adding `.env.example` files if needed
 - Document any required environment variables in README files
 
 ## CI/CD Considerations
 
 If setting up CI/CD:
+
 1. Install Rust toolchain
 2. Install Node.js >= 18
 3. Install Bun (or use npm/yarn/pnpm)
@@ -293,8 +303,8 @@ Be aware of license compatibility when using these packages.
 ## Questions or Issues
 
 If you encounter issues or have questions:
+
 1. Check the relevant README file
 2. Review example implementations
 3. Check test files for usage patterns
 4. Review git history for similar changes
-

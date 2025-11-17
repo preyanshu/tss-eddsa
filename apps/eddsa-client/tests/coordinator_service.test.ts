@@ -77,7 +77,7 @@ describe("CoordinatorService", () => {
           commitData.blindFactors,
           commitData.publicKeys,
           commitData.commitments,
-          commitData.parties[i],
+          commitData.parties[i]
         );
         partyShares.push({ partyId, ...shares });
       }
@@ -92,7 +92,7 @@ describe("CoordinatorService", () => {
           shareData[partyId].publicKeys,
           shareData[partyId].allSecretShares,
           shareData[partyId].allVssSchemes,
-          shareData[partyId].partyIndex,
+          shareData[partyId].partyIndex
         );
         sharedKeys.push(keyResult.sharedKey);
       }

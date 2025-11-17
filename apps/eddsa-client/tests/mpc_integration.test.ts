@@ -59,7 +59,7 @@ describe("MPC Integration Tests", () => {
           commitData.blindFactors,
           commitData.publicKeys,
           commitData.commitments,
-          commitData.parties[i],
+          commitData.parties[i]
         );
         partyShares.push({ partyId, ...shares });
       }
@@ -74,7 +74,7 @@ describe("MPC Integration Tests", () => {
           shareData[partyId].publicKeys,
           shareData[partyId].allSecretShares,
           shareData[partyId].allVssSchemes,
-          shareData[partyId].partyIndex,
+          shareData[partyId].partyIndex
         );
         partySharedKeys.push({ partyId, sharedKey: keyResult.sharedKey });
       }
@@ -101,7 +101,7 @@ describe("MPC Integration Tests", () => {
         const partyId = signingParties[i];
         const eph = services[partyId].startEphemeralKeyGeneration(
           message,
-          signingSession.signingParties[i],
+          signingSession.signingParties[i]
         );
         partyEphData.push({ partyId, ...eph });
       }
@@ -126,7 +126,7 @@ describe("MPC Integration Tests", () => {
           ephCommitData.ephBlindFactors,
           ephCommitData.ephRPoints,
           ephCommitData.ephCommitments,
-          signingSession.signingParties,
+          signingSession.signingParties
         );
         partyEphShares.push({ partyId, ...shares });
       }
@@ -145,7 +145,7 @@ describe("MPC Integration Tests", () => {
           ephShareData[partyId].allEphSecretShares,
           ephShareData[partyId].allEphVssSchemes,
           ephShareData[partyId].partyIndex,
-          signingSession.signingParties,
+          signingSession.signingParties
         );
         ephSharedKeys.push(ephResult.ephSharedKey);
       }
@@ -164,7 +164,7 @@ describe("MPC Integration Tests", () => {
         const partyId = signingParties[i];
         const localSigResult = services[partyId].computeLocalSignature(
           message,
-          ephSharedKeys[i],
+          ephSharedKeys[i]
         );
         partyLocalSigs.push({ partyId, localSig: localSigResult.localSig });
       }
@@ -203,10 +203,10 @@ describe("MPC Integration Tests", () => {
         const { threshold, totalParties, signingParties } = testCase;
         const allPartyIds = Array.from(
           { length: totalParties },
-          (_, i) => `party-${i}`,
+          (_, i) => `party-${i}`
         );
         const message = Buffer.from(
-          `test message for ${threshold}-of-${totalParties}`,
+          `test message for ${threshold}-of-${totalParties}`
         );
 
         // Setup
@@ -251,7 +251,7 @@ describe("MPC Integration Tests", () => {
             commitData.blindFactors,
             commitData.publicKeys,
             commitData.commitments,
-            commitData.parties[i],
+            commitData.parties[i]
           );
           partyShares.push({ partyId, ...shares });
         }
@@ -265,7 +265,7 @@ describe("MPC Integration Tests", () => {
             shareData[partyId].publicKeys,
             shareData[partyId].allSecretShares,
             shareData[partyId].allVssSchemes,
-            shareData[partyId].partyIndex,
+            shareData[partyId].partyIndex
           );
           partySharedKeys.push({ partyId, sharedKey: keyResult.sharedKey });
         }
@@ -274,7 +274,7 @@ describe("MPC Integration Tests", () => {
         // Signing
         const signingSession = coordinator.startSigning(
           message,
-          signingParties,
+          signingParties
         );
 
         const partyEphData: Array<{
@@ -288,7 +288,7 @@ describe("MPC Integration Tests", () => {
           const partyId = signingParties[i];
           const eph = services[partyId].startEphemeralKeyGeneration(
             message,
-            signingSession.signingParties[i],
+            signingSession.signingParties[i]
           );
           partyEphData.push({ partyId, ...eph });
         }
@@ -312,7 +312,7 @@ describe("MPC Integration Tests", () => {
             ephCommitData.ephBlindFactors,
             ephCommitData.ephRPoints,
             ephCommitData.ephCommitments,
-            signingSession.signingParties,
+            signingSession.signingParties
           );
           partyEphShares.push({ partyId, ...shares });
         }
@@ -330,7 +330,7 @@ describe("MPC Integration Tests", () => {
             ephShareData[partyId].allEphSecretShares,
             ephShareData[partyId].allEphVssSchemes,
             ephShareData[partyId].partyIndex,
-            signingSession.signingParties,
+            signingSession.signingParties
           );
           ephSharedKeys.push(ephResult.ephSharedKey);
         }
@@ -349,7 +349,7 @@ describe("MPC Integration Tests", () => {
           const partyId = signingParties[i];
           const localSigResult = services[partyId].computeLocalSignature(
             message,
-            ephSharedKeys[i],
+            ephSharedKeys[i]
           );
           partyLocalSigs.push({ partyId, localSig: localSigResult.localSig });
         }

@@ -102,7 +102,7 @@ export class MPCService {
     blindFactors: SerializableBigInt[],
     publicKeys: SerializableBigInt[],
     commitments: SerializableBigInt[],
-    partyIndex: number,
+    partyIndex: number
   ): ShareDistributionResult {
     if (!this.keyId) {
       throw new ServiceError("Service not initialized");
@@ -110,13 +110,13 @@ export class MPCService {
 
     // Normalize to Rust format (Array bytes) for Rust bindings
     const blindFactorsRust = blindFactors.map((bf) =>
-      serialization.normalizeBytesForRust(bf),
+      serialization.normalizeBytesForRust(bf)
     );
     const publicKeysRust = publicKeys.map((pk) =>
-      serialization.normalizeBytesForRust(pk),
+      serialization.normalizeBytesForRust(pk)
     );
     const commitmentsRust = commitments.map((c) =>
-      serialization.normalizeBytesForRust(c),
+      serialization.normalizeBytesForRust(c)
     );
 
     const result = MPCClient.distributeShares(
@@ -126,14 +126,14 @@ export class MPCService {
       blindFactorsRust,
       publicKeysRust,
       commitmentsRust,
-      partyIndex,
+      partyIndex
     );
 
     // Return HTTP format (Array bytes)
     return {
       vss: serialization.serializeVss(result.vss),
       secretShares: result.secretShares.map((s: SecretShare) =>
-        serialization.serializeForHttp(s),
+        serialization.serializeForHttp(s)
       ),
     };
   }
@@ -157,7 +157,7 @@ export class MPCService {
     publicKeys: SerializableBigInt[],
     allSecretShares: SecretShare[][],
     allVssSchemes: VSSScheme[],
-    partyIndex: number,
+    partyIndex: number
   ): KeypairConstructionResult {
     if (!this.keyId) {
       throw new ServiceError("Service not initialized");
@@ -165,7 +165,7 @@ export class MPCService {
 
     // Normalize to Rust format (Array bytes) for Rust bindings
     const publicKeysRust = publicKeys.map((pk) =>
-      serialization.normalizeBytesForRust(pk),
+      serialization.normalizeBytesForRust(pk)
     );
     const allSecretSharesRust =
       serialization.normalize2DArrayForRust(allSecretShares);
@@ -179,7 +179,7 @@ export class MPCService {
       publicKeysRust,
       allSecretSharesRust, // Full 2D array
       allVssSchemes,
-      partyIndex,
+      partyIndex
     );
 
     // Return HTTP format (Array bytes)
@@ -206,7 +206,7 @@ export class MPCService {
    */
   createEphemeralKey(
     message: Buffer | number[] | string,
-    partyIndex: number,
+    partyIndex: number
   ): EphemeralKeyResult {
     if (!this.keyId) {
       throw new ServiceError("Service not initialized");
@@ -221,7 +221,7 @@ export class MPCService {
     const ephData = MPCClient.createEphemeralKey(
       this.keyId,
       messageArray,
-      partyIndex,
+      partyIndex
     );
 
     return {
@@ -240,7 +240,7 @@ export class MPCService {
    */
   startEphemeralKeyGeneration(
     message: Buffer | number[] | string,
-    partyIndex: number,
+    partyIndex: number
   ): {
     ephKeyId: string;
     ephR: SerializableBigInt;
@@ -261,7 +261,7 @@ export class MPCService {
     const ephData = MPCClient.createEphemeralKey(
       this.keyId,
       messageArray,
-      partyIndex,
+      partyIndex
     );
 
     // Generate commitment
@@ -309,17 +309,17 @@ export class MPCService {
     ephBlindFactors: SerializableBigInt[],
     ephRPoints: SerializableBigInt[],
     ephCommitments: SerializableBigInt[],
-    signingParties: number[],
+    signingParties: number[]
   ): ShareDistributionResult {
     // Normalize to Rust format (Array bytes) for Rust bindings
     const ephBlindFactorsRust = ephBlindFactors.map((bf) =>
-      serialization.normalizeBytesForRust(bf),
+      serialization.normalizeBytesForRust(bf)
     );
     const ephRPointsRust = ephRPoints.map((r) =>
-      serialization.normalizeBytesForRust(r),
+      serialization.normalizeBytesForRust(r)
     );
     const ephCommitmentsRust = ephCommitments.map((c) =>
-      serialization.normalizeBytesForRust(c),
+      serialization.normalizeBytesForRust(c)
     );
 
     const result = MPCClient.distributeEphemeralShares(
@@ -329,14 +329,14 @@ export class MPCService {
       ephBlindFactorsRust,
       ephRPointsRust,
       ephCommitmentsRust,
-      signingParties,
+      signingParties
     );
 
     // Return HTTP format (Array bytes)
     return {
       vss: serialization.serializeVss(result.vss),
       secretShares: result.secretShares.map((s: SecretShare) =>
-        serialization.serializeForHttp(s),
+        serialization.serializeForHttp(s)
       ),
     };
   }
@@ -363,11 +363,11 @@ export class MPCService {
     allEphSecretShares: SecretShare[][],
     allEphVssSchemes: VSSScheme[],
     partyIndex: number,
-    signingParties: number[],
+    signingParties: number[]
   ): { ephSharedKey: { R: SerializableBigInt; rI: SerializableBigInt } } {
     // Normalize to Rust format (Array bytes) for Rust bindings
     const ephRPointsRust = ephRPoints.map((r) =>
-      serialization.normalizeBytesForRust(r),
+      serialization.normalizeBytesForRust(r)
     );
     const allEphSecretSharesRust =
       serialization.normalize2DArrayForRust(allEphSecretShares);
@@ -382,7 +382,7 @@ export class MPCService {
       allEphSecretSharesRust, // Full 2D array
       allEphVssSchemes,
       partyIndex,
-      signingParties,
+      signingParties
     );
 
     // Return HTTP format (Array bytes, always use R for HTTP)
@@ -401,7 +401,7 @@ export class MPCService {
    */
   computeLocalSignature(
     message: Buffer | number[] | string,
-    ephSharedKey: EphemeralSharedKey,
+    ephSharedKey: EphemeralSharedKey
   ): { localSig: { gammaI: SerializableBigInt; k: SerializableBigInt } } {
     if (!this.sharedKey) {
       throw new ServiceError("Shared key not constructed");
@@ -415,7 +415,7 @@ export class MPCService {
     const localSig = MPCClient.computeLocalSignature(
       messageBuffer,
       ephSharedKeyRust,
-      this.sharedKey,
+      this.sharedKey
     );
 
     // Return HTTP format (Array bytes)

@@ -88,11 +88,11 @@ export class CoordinatorService {
    */
   registerParty(
     partyId: string,
-    publicKey: SerializableBigInt,
+    publicKey: SerializableBigInt
   ): PartyRegistrationResponse {
     if (!this.session) {
       throw new SessionError(
-        "Session not initialized. Call startKeyGeneration() first",
+        "Session not initialized. Call startKeyGeneration() first"
       );
     }
 
@@ -119,7 +119,7 @@ export class CoordinatorService {
     const party = this.parties.find((p) => p.partyId === partyId);
     if (!party || party.protocolIndex === undefined) {
       throw new PartyError(
-        `Party ${partyId} not found or protocolIndex not set`,
+        `Party ${partyId} not found or protocolIndex not set`
       );
     }
     return {
@@ -141,7 +141,7 @@ export class CoordinatorService {
       partyId: string;
       commitment: SerializableBigInt;
       blindFactor: SerializableBigInt;
-    }>,
+    }>
   ): CommitData {
     // partyCommitments: [{ partyId, commitment, blindFactor }, ...]
     this.commitments = [];
@@ -149,16 +149,16 @@ export class CoordinatorService {
 
     // Sort by partyId to match party order
     const sorted = partyCommitments.sort((a, b) =>
-      a.partyId.localeCompare(b.partyId),
+      a.partyId.localeCompare(b.partyId)
     );
 
     // Normalize to Buffer for internal storage
     for (const commit of sorted) {
       this.commitments.push(
-        serialization.normalizeBytesToBuffer(commit.commitment),
+        serialization.normalizeBytesToBuffer(commit.commitment)
       );
       this.blindFactors.push(
-        serialization.normalizeBytesToBuffer(commit.blindFactor),
+        serialization.normalizeBytesToBuffer(commit.blindFactor)
       );
     }
 
@@ -170,13 +170,13 @@ export class CoordinatorService {
       threshold: this.session.threshold,
       shareCount: this.session.totalParties,
       blindFactors: this.blindFactors.map((bf) =>
-        serialization.serializeForHttp(bf),
+        serialization.serializeForHttp(bf)
       ),
       publicKeys: this.parties.map((p) =>
-        serialization.serializeForHttp(p.publicKey),
+        serialization.serializeForHttp(p.publicKey)
       ),
       commitments: this.commitments.map((c) =>
-        serialization.serializeForHttp(c),
+        serialization.serializeForHttp(c)
       ),
       parties: this.parties.map((p) => p.protocolIndex || 0),
     };
@@ -195,7 +195,7 @@ export class CoordinatorService {
       partyId: string;
       vss: VSSScheme;
       secretShares: SecretShare[];
-    }>,
+    }>
   ): ShareData {
     // partyShares: [{ partyId, vss, secretShares }, ...]
     this.allVssSchemes = [];
@@ -203,14 +203,14 @@ export class CoordinatorService {
 
     // Sort by partyId
     const sorted = partyShares.sort((a, b) =>
-      a.partyId.localeCompare(b.partyId),
+      a.partyId.localeCompare(b.partyId)
     );
 
     // Normalize secretShares to Buffer for internal storage
     for (const share of sorted) {
       this.allVssSchemes.push(share.vss);
       this.allSecretShares.push(
-        share.secretShares.map((s) => serialization.normalizeBytesToBuffer(s)),
+        share.secretShares.map((s) => serialization.normalizeBytesToBuffer(s))
       );
     }
 
@@ -235,10 +235,10 @@ export class CoordinatorService {
         threshold,
         shareCount,
         publicKeys: this.parties.map((p) =>
-          serialization.serializeForHttp(p.publicKey),
+          serialization.serializeForHttp(p.publicKey)
         ),
         allSecretShares: serialization.serialize2DArrayForHttp(
-          this.allSecretShares,
+          this.allSecretShares
         ),
         allVssSchemes: this.allVssSchemes,
         partyIndex: party.protocolIndex,
@@ -256,7 +256,7 @@ export class CoordinatorService {
    * @returns {Object} - { aggregatePublicKey: {bytes: Array}, aggregatePublicKeyHex, sharedKeys } in HTTP format
    */
   collectSharedKeys(
-    partySharedKeys: Array<{ partyId: string; sharedKey: SharedKey }>,
+    partySharedKeys: Array<{ partyId: string; sharedKey: SharedKey }>
   ): {
     aggregatePublicKey: SerializableBigInt;
     aggregatePublicKeyHex: string;
@@ -267,7 +267,7 @@ export class CoordinatorService {
 
     // Sort by partyId
     const sorted = partySharedKeys.sort((a, b) =>
-      a.partyId.localeCompare(b.partyId),
+      a.partyId.localeCompare(b.partyId)
     );
 
     // Normalize sharedKeys to Buffer for internal storage and Rust calls
@@ -284,7 +284,7 @@ export class CoordinatorService {
     // Compute aggregate public key
     const { aggregatePublicKey } = MPCClient.aggregateKey(this.sharedKeys);
     const aggregatePublicKeyHex = Buffer.from(
-      aggregatePublicKey.bytes,
+      aggregatePublicKey.bytes
     ).toString("hex");
 
     // Store for later use in signing (keep as Buffer internally)
@@ -313,7 +313,7 @@ export class CoordinatorService {
    */
   startSigning(
     message: Buffer | number[] | string,
-    signingParties: string[],
+    signingParties: string[]
   ): {
     message: Buffer;
     signingParties: number[];
@@ -328,7 +328,7 @@ export class CoordinatorService {
       validateSigningParties(
         signingParties.length,
         this.session.threshold,
-        this.session.totalParties,
+        this.session.totalParties
       );
     }
 
@@ -364,7 +364,7 @@ export class CoordinatorService {
    * @returns {Object} - { ephRPoints, signingPartyIndices }
    */
   collectEphemeralKeys(
-    partyEphKeys: Array<{ partyId: string; ephR: SerializableBigInt }>,
+    partyEphKeys: Array<{ partyId: string; ephR: SerializableBigInt }>
   ): {
     ephRPoints: SerializableBigInt[];
     signingPartyIndices: number[];
@@ -372,7 +372,7 @@ export class CoordinatorService {
     // partyEphKeys: [{ partyId, ephR }, ...]
     const ephRPoints = [];
     const sorted = partyEphKeys.sort((a, b) =>
-      a.partyId.localeCompare(b.partyId),
+      a.partyId.localeCompare(b.partyId)
     );
 
     for (const eph of sorted) {
@@ -400,7 +400,7 @@ export class CoordinatorService {
       partyId: string;
       commitment: SerializableBigInt;
       blindFactor: SerializableBigInt;
-    }>,
+    }>
   ): {
     ephCommitments: SerializableBigInt[];
     ephBlindFactors: SerializableBigInt[];
@@ -409,7 +409,7 @@ export class CoordinatorService {
     const ephCommitments = [];
     const ephBlindFactors = [];
     const sorted = partyEphCommitments.sort((a, b) =>
-      a.partyId.localeCompare(b.partyId),
+      a.partyId.localeCompare(b.partyId)
     );
 
     for (const commit of sorted) {
@@ -441,11 +441,11 @@ export class CoordinatorService {
       ephR: SerializableBigInt;
       commitment: SerializableBigInt;
       blindFactor: SerializableBigInt;
-    }>,
+    }>
   ): EphemeralCommitData {
     // partyEphData: [{ partyId, ephR, commitment, blindFactor }, ...]
     const sorted = partyEphData.sort((a, b) =>
-      a.partyId.localeCompare(b.partyId),
+      a.partyId.localeCompare(b.partyId)
     );
 
     const ephRPoints = [];
@@ -456,10 +456,10 @@ export class CoordinatorService {
     for (const data of sorted) {
       ephRPoints.push(serialization.normalizeBytesToBuffer(data.ephR));
       ephCommitments.push(
-        serialization.normalizeBytesToBuffer(data.commitment),
+        serialization.normalizeBytesToBuffer(data.commitment)
       );
       ephBlindFactors.push(
-        serialization.normalizeBytesToBuffer(data.blindFactor),
+        serialization.normalizeBytesToBuffer(data.blindFactor)
       );
     }
 
@@ -474,10 +474,10 @@ export class CoordinatorService {
     return {
       ephRPoints: ephRPoints.map((r) => serialization.serializeForHttp(r)),
       ephCommitments: ephCommitments.map((c) =>
-        serialization.serializeForHttp(c),
+        serialization.serializeForHttp(c)
       ),
       ephBlindFactors: ephBlindFactors.map((bf) =>
-        serialization.serializeForHttp(bf),
+        serialization.serializeForHttp(bf)
       ),
       signingPartyIndices: this.signingPartyIndices,
     };
@@ -495,19 +495,19 @@ export class CoordinatorService {
       partyId: string;
       vss: VSSScheme;
       secretShares: SecretShare[];
-    }>,
+    }>
   ): EphemeralShareData {
     const allEphVssSchemes = [];
     const allEphSecretShares = [];
     const sorted = partyEphShares.sort((a, b) =>
-      a.partyId.localeCompare(b.partyId),
+      a.partyId.localeCompare(b.partyId)
     );
 
     // Normalize secretShares to Buffer for internal storage
     for (const share of sorted) {
       allEphVssSchemes.push(share.vss);
       allEphSecretShares.push(
-        share.secretShares.map((s) => serialization.normalizeBytesToBuffer(s)),
+        share.secretShares.map((s) => serialization.normalizeBytesToBuffer(s))
       );
     }
 
@@ -530,7 +530,9 @@ export class CoordinatorService {
     for (let i = 0; i < this.signingPartyIndices.length; i++) {
       const partyIdx = this.signingPartyIndices[i];
       if (partyIdx === undefined) {
-        throw new StateError(`Signing party index at position ${i} is undefined`);
+        throw new StateError(
+          `Signing party index at position ${i} is undefined`
+        );
       }
       const party = this.parties[partyIdx];
       if (!party) {
@@ -541,10 +543,10 @@ export class CoordinatorService {
         threshold,
         shareCount,
         ephRPoints: this.ephRPoints.map((r) =>
-          serialization.serializeForHttp(r),
+          serialization.serializeForHttp(r)
         ),
         allEphSecretShares: serialization.serialize2DArrayForHttp(
-          this.allEphSecretShares,
+          this.allEphSecretShares
         ),
         allEphVssSchemes: this.allEphVssSchemes,
         partyIndex: partyIdx,
@@ -563,12 +565,12 @@ export class CoordinatorService {
    * @returns {Object} - { signature: {r, s}, signatureHex, aggregatePublicKey: {bytes: Array}, aggregatePublicKeyHex, isValid } in HTTP format
    */
   collectLocalSignatures(
-    partyLocalSigs: Array<{ partyId: string; localSig: LocalSignature }>,
+    partyLocalSigs: Array<{ partyId: string; localSig: LocalSignature }>
   ): SignatureResult {
     // partyLocalSigs: [{ partyId, localSig }, ...]
     const localSigs = [];
     const sorted = partyLocalSigs.sort((a, b) =>
-      a.partyId.localeCompare(b.partyId),
+      a.partyId.localeCompare(b.partyId)
     );
 
     // Normalize to Rust format (Array bytes) for Rust bindings
@@ -600,11 +602,11 @@ export class CoordinatorService {
       if (aggregateR && aggregateR.bytes) {
         if (!Array.isArray(aggregateR.bytes)) {
           aggregateR.bytes = Array.from(aggregateR.bytes, (b) =>
-            typeof b === "number" ? b : Number(b),
+            typeof b === "number" ? b : Number(b)
           );
         } else {
           aggregateR.bytes = aggregateR.bytes.map((b) =>
-            typeof b === "number" ? b : Number(b),
+            typeof b === "number" ? b : Number(b)
           );
         }
       }
@@ -615,7 +617,7 @@ export class CoordinatorService {
       localSigs,
       this.signingPartyIndices,
       this.allVssSchemes,
-      this.allEphVssSchemes,
+      this.allEphVssSchemes
     );
 
     // Generate final signature
@@ -634,13 +636,13 @@ export class CoordinatorService {
       vssSum,
       localSigs,
       this.signingPartyIndices,
-      aggregateR,
+      aggregateR
     );
 
     // Verify signature
     // Convert message to Array format for verification (Rust binding expects Array)
     const messageArray = serialization.messageToArray(
-      this.signingSession.message,
+      this.signingSession.message
     );
 
     // Convert aggregatePublicKey to Array format for Rust (Rust binding expects Array bytes)
@@ -653,7 +655,7 @@ export class CoordinatorService {
     const isValid = MPCClient.verifySignature(
       signature,
       messageArray,
-      aggregatePublicKeyArray,
+      aggregatePublicKeyArray
     );
 
     // Return HTTP format (Array bytes)
@@ -670,10 +672,10 @@ export class CoordinatorService {
       },
       signatureHex,
       aggregatePublicKey: serialization.serializeForHttp(
-        this.aggregatePublicKey,
+        this.aggregatePublicKey
       ),
       aggregatePublicKeyHex: Buffer.from(
-        this.aggregatePublicKey.bytes,
+        this.aggregatePublicKey.bytes
       ).toString("hex"),
       isValid,
     };
@@ -704,13 +706,13 @@ export class CoordinatorService {
       threshold: this.session.threshold,
       shareCount: this.session.totalParties,
       blindFactors: this.blindFactors.map((bf) =>
-        serialization.serializeForHttp(bf),
+        serialization.serializeForHttp(bf)
       ),
       publicKeys: this.parties.map((p) =>
-        serialization.serializeForHttp(p.publicKey),
+        serialization.serializeForHttp(p.publicKey)
       ),
       commitments: this.commitments.map((c) =>
-        serialization.serializeForHttp(c),
+        serialization.serializeForHttp(c)
       ),
       parties: this.parties.map((p) => p.protocolIndex || 0),
     };
@@ -728,7 +730,7 @@ export class CoordinatorService {
       this.allSecretShares.length === 0
     ) {
       throw new StateError(
-        "Shares not collected. Make sure collect-shares was called first.",
+        "Shares not collected. Make sure collect-shares was called first."
       );
     }
 
@@ -748,10 +750,10 @@ export class CoordinatorService {
         threshold,
         shareCount,
         publicKeys: this.parties.map((p) =>
-          serialization.serializeForHttp(p.publicKey),
+          serialization.serializeForHttp(p.publicKey)
         ),
         allSecretShares: serialization.serialize2DArrayForHttp(
-          this.allSecretShares,
+          this.allSecretShares
         ),
         allVssSchemes: this.allVssSchemes,
         partyIndex: party.protocolIndex,
@@ -776,10 +778,10 @@ export class CoordinatorService {
     return {
       ephRPoints: this.ephRPoints.map((r) => serialization.serializeForHttp(r)),
       ephCommitments: (this.ephCommitments || []).map((c) =>
-        serialization.serializeForHttp(c),
+        serialization.serializeForHttp(c)
       ),
       ephBlindFactors: (this.ephBlindFactors || []).map((bf) =>
-        serialization.serializeForHttp(bf),
+        serialization.serializeForHttp(bf)
       ),
       signingPartyIndices: this.signingPartyIndices,
     };
@@ -793,12 +795,12 @@ export class CoordinatorService {
   getEphKeyConstructionDataHttp(): EphemeralShareData {
     if (!this.allEphSecretShares || this.allEphSecretShares.length === 0) {
       throw new StateError(
-        "Ephemeral shares not collected. Make sure collect-ephemeral-shares was called first.",
+        "Ephemeral shares not collected. Make sure collect-ephemeral-shares was called first."
       );
     }
     if (!this.ephRPoints || this.ephRPoints.length === 0) {
       throw new StateError(
-        "Ephemeral R points not available. Make sure collect-ephemeral-keys was called first.",
+        "Ephemeral R points not available. Make sure collect-ephemeral-keys was called first."
       );
     }
     if (!this.signingPartyIndices || !this.session || !this.allEphVssSchemes) {
@@ -812,7 +814,9 @@ export class CoordinatorService {
     for (let i = 0; i < this.signingPartyIndices.length; i++) {
       const partyIdx = this.signingPartyIndices[i];
       if (partyIdx === undefined) {
-        throw new StateError(`Signing party index at position ${i} is undefined`);
+        throw new StateError(
+          `Signing party index at position ${i} is undefined`
+        );
       }
       const party = this.parties[partyIdx];
       if (!party) {
@@ -823,10 +827,10 @@ export class CoordinatorService {
         threshold,
         shareCount,
         ephRPoints: this.ephRPoints.map((r) =>
-          serialization.serializeForHttp(r),
+          serialization.serializeForHttp(r)
         ),
         allEphSecretShares: serialization.serialize2DArrayForHttp(
-          this.allEphSecretShares,
+          this.allEphSecretShares
         ),
         allEphVssSchemes: this.allEphVssSchemes,
         partyIndex: partyIdx,

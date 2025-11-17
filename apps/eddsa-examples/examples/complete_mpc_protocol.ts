@@ -46,35 +46,35 @@ import {
 export async function runCompleteMPCProtocol(
   threshold: number = 2,
   totalParties: number = 3,
-  signingParties: string[] = ["party-0", "party-1"],
+  signingParties: string[] = ["party-0", "party-1"]
 ): Promise<SignatureResult> {
   // ============================================
   // INPUT VALIDATION
   // ============================================
   console.log(
-    "╔══════════════════════════════════════════════════════════════╗",
+    "╔══════════════════════════════════════════════════════════════╗"
   );
   console.log(
-    "║     Complete MPC Protocol Demonstration                      ║",
+    "║     Complete MPC Protocol Demonstration                      ║"
   );
   console.log(
-    "╚══════════════════════════════════════════════════════════════╝\n",
+    "╚══════════════════════════════════════════════════════════════╝\n"
   );
 
   validateThreshold(threshold, totalParties);
   validateSigningParties(signingParties.length, threshold, totalParties);
 
   console.log(
-    `Configuration: (t=${threshold}, n=${totalParties}) threshold signature`,
+    `Configuration: (t=${threshold}, n=${totalParties}) threshold signature`
   );
   console.log(
-    `Signing parties: ${signingParties.length} (${signingParties.join(", ")})\n`,
+    `Signing parties: ${signingParties.length} (${signingParties.join(", ")})\n`
   );
 
   // Generate all party IDs
   const allPartyIds = Array.from(
     { length: totalParties },
-    (_, i) => `party-${i}`,
+    (_, i) => `party-${i}`
   );
   console.log("Architecture Overview:");
   allPartyIds.forEach((partyId) => {
@@ -86,13 +86,13 @@ export async function runCompleteMPCProtocol(
   // SETUP: Initialize Services
   // ============================================
   console.log(
-    "┌──────────────────────────────────────────────────────────────┐",
+    "┌──────────────────────────────────────────────────────────────┐"
   );
   console.log(
-    "│ SETUP: Initializing Services                                 │",
+    "│ SETUP: Initializing Services                                 │"
   );
   console.log(
-    "└──────────────────────────────────────────────────────────────┘\n",
+    "└──────────────────────────────────────────────────────────────┘\n"
   );
 
   // In production, each service runs on a separate server
@@ -108,29 +108,29 @@ export async function runCompleteMPCProtocol(
   // PHASE 1: KEY GENERATION
   // ============================================
   console.log(
-    "┌──────────────────────────────────────────────────────────────┐",
+    "┌──────────────────────────────────────────────────────────────┐"
   );
   console.log(
-    "│ PHASE 1: KEY GENERATION                                       │",
+    "│ PHASE 1: KEY GENERATION                                       │"
   );
   console.log(
-    "│                                                              │",
+    "│                                                              │"
   );
   console.log(
-    "│ This phase establishes a shared secret key across all       │",
+    "│ This phase establishes a shared secret key across all       │"
   );
   console.log(
-    "│ parties without any single party knowing the full key.      │",
+    "│ parties without any single party knowing the full key.      │"
   );
   console.log(
-    "└──────────────────────────────────────────────────────────────┘\n",
+    "└──────────────────────────────────────────────────────────────┘\n"
   );
 
   // Step 1: Coordinator starts key generation session
   console.log("Step 1: Coordinator starts key generation session");
   console.log("  [Coordinator] POST /api/keygen/start");
   console.log(
-    `    Body: { threshold: ${threshold}, totalParties: ${totalParties} }`,
+    `    Body: { threshold: ${threshold}, totalParties: ${totalParties} }`
   );
   coordinator.startKeyGeneration(threshold, totalParties);
   console.log("  ✓ Session started\n");
@@ -142,7 +142,7 @@ export async function runCompleteMPCProtocol(
 
   for (const partyId of allPartyIds) {
     console.log(
-      `  [${partyId}] POST http://coordinator-server:3000/api/keygen/register`,
+      `  [${partyId}] POST http://coordinator-server:3000/api/keygen/register`
     );
     const service = services[partyId];
     if (!service) {
@@ -151,10 +151,10 @@ export async function runCompleteMPCProtocol(
     partyInits[partyId] = service.register();
     coordinator.registerParty(partyId, partyInits[partyId].publicKey);
     const partyIndex = (coordinator as any).parties.findIndex(
-      (p: any) => p.partyId === partyId,
+      (p: any) => p.partyId === partyId
     );
     console.log(
-      `    Response: { partyId: "${partyId}", partyIndex: ${partyIndex} }`,
+      `    Response: { partyId: "${partyId}", partyIndex: ${partyIndex} }`
     );
   }
   console.log("  ✓ All parties registered\n");
@@ -162,7 +162,7 @@ export async function runCompleteMPCProtocol(
   // Step 3: Coordinator collects commitments
   console.log("Step 3: Coordinator requests commitments from all parties");
   console.log(
-    "  Commitments are used to ensure parties cannot cheat during share distribution",
+    "  Commitments are used to ensure parties cannot cheat during share distribution"
   );
   const partyCommitments: Array<{
     partyId: string;
@@ -185,7 +185,7 @@ export async function runCompleteMPCProtocol(
   // Step 4: Coordinator collects secret shares
   console.log("Step 4: Coordinator requests secret shares from all parties");
   console.log(
-    "  Each party distributes shares of their secret to all other parties",
+    "  Each party distributes shares of their secret to all other parties"
   );
   const partyShares: Array<{ partyId: string; vss: any; secretShares: any[] }> =
     [];
@@ -204,7 +204,7 @@ export async function runCompleteMPCProtocol(
       throw new Error(`Party index at position ${i} is undefined`);
     }
     console.log(
-      `    Body: { threshold: ${commitData.threshold}, shareCount: ${commitData.shareCount}, partyIndex: ${partyIndex} }`,
+      `    Body: { threshold: ${commitData.threshold}, shareCount: ${commitData.shareCount}, partyIndex: ${partyIndex} }`
     );
     const shares = service.distributeShares(
       commitData.threshold,
@@ -212,7 +212,7 @@ export async function runCompleteMPCProtocol(
       commitData.blindFactors,
       commitData.publicKeys,
       commitData.commitments,
-      partyIndex,
+      partyIndex
     );
     partyShares.push({ partyId, ...shares });
   }
@@ -222,10 +222,10 @@ export async function runCompleteMPCProtocol(
 
   // Step 5: Parties construct their shared keypairs
   console.log(
-    "Step 5: Coordinator requests keypair construction from all parties",
+    "Step 5: Coordinator requests keypair construction from all parties"
   );
   console.log(
-    "  Each party constructs their shared keypair from collected shares",
+    "  Each party constructs their shared keypair from collected shares"
   );
   const partySharedKeys: Array<{ partyId: string; sharedKey: any }> = [];
   for (const partyId of allPartyIds) {
@@ -244,7 +244,7 @@ export async function runCompleteMPCProtocol(
       data.publicKeys,
       data.allSecretShares,
       data.allVssSchemes,
-      data.partyIndex,
+      data.partyIndex
     );
     partySharedKeys.push({ partyId, sharedKey: keyResult.sharedKey });
   }
@@ -252,29 +252,29 @@ export async function runCompleteMPCProtocol(
   const keygenResult = coordinator.collectSharedKeys(partySharedKeys);
   console.log("  ✓ Shared keypairs constructed");
   console.log(
-    `  Aggregate Public Key: ${keygenResult.aggregatePublicKeyHex.substring(0, 64)}...\n`,
+    `  Aggregate Public Key: ${keygenResult.aggregatePublicKeyHex.substring(0, 64)}...\n`
   );
 
   // ============================================
   // PHASE 2: SIGNING
   // ============================================
   console.log(
-    "┌──────────────────────────────────────────────────────────────┐",
+    "┌──────────────────────────────────────────────────────────────┐"
   );
   console.log(
-    "│ PHASE 2: SIGNING                                             │",
+    "│ PHASE 2: SIGNING                                             │"
   );
   console.log(
-    "│                                                              │",
+    "│                                                              │"
   );
   console.log(
-    "│ This phase creates a threshold signature where at least     │",
+    "│ This phase creates a threshold signature where at least     │"
   );
   console.log(
-    "│ `threshold` parties must participate to sign a message.     │",
+    "│ `threshold` parties must participate to sign a message.     │"
   );
   console.log(
-    "└──────────────────────────────────────────────────────────────┘\n",
+    "└──────────────────────────────────────────────────────────────┘\n"
   );
 
   const message = Buffer.from("Hello, Threshold Signatures!");
@@ -284,17 +284,17 @@ export async function runCompleteMPCProtocol(
   console.log("Step 1: Coordinator starts signing session");
   console.log(`  [Coordinator] POST /api/sign/start`);
   console.log(
-    `    Body: { message: Buffer, signingParties: [${signingParties.map((p) => `"${p}"`).join(", ")}] }`,
+    `    Body: { message: Buffer, signingParties: [${signingParties.map((p) => `"${p}"`).join(", ")}] }`
   );
   const signingSession = coordinator.startSigning(message, signingParties);
   console.log(
-    `  ✓ Signing session started (${signingParties.length} signers)\n`,
+    `  ✓ Signing session started (${signingParties.length} signers)\n`
   );
 
   // Step 2: Generate ephemeral keys and commitments
   console.log("Step 2: Coordinator requests ephemeral keys and commitments");
   console.log(
-    "  Ephemeral keys are one-time keys used only for this signature",
+    "  Ephemeral keys are one-time keys used only for this signature"
   );
   const partyEphData: Array<{
     partyId: string;
@@ -317,10 +317,7 @@ export async function runCompleteMPCProtocol(
       throw new Error(`Signing party index at position ${i} is undefined`);
     }
     console.log(`  [${partyId}] POST /api/mpc/sign/ephemeral-key`);
-    const eph = service.startEphemeralKeyGeneration(
-      message,
-      signingPartyIndex,
-    );
+    const eph = service.startEphemeralKeyGeneration(message, signingPartyIndex);
     partyEphData.push({ partyId, ...eph });
   }
 
@@ -330,7 +327,7 @@ export async function runCompleteMPCProtocol(
 
   // Step 3: Distribute ephemeral shares
   console.log(
-    "Step 3: Coordinator requests ephemeral shares from signing parties",
+    "Step 3: Coordinator requests ephemeral shares from signing parties"
   );
   const signingShareCount = signingParties.length;
   const signingThreshold = threshold;
@@ -361,7 +358,7 @@ export async function runCompleteMPCProtocol(
       ephCommitData.ephBlindFactors,
       ephCommitData.ephRPoints,
       ephCommitData.ephCommitments,
-      signingSession.signingParties,
+      signingSession.signingParties
     );
     partyEphShares.push({ partyId, ...shares });
   }
@@ -398,7 +395,7 @@ export async function runCompleteMPCProtocol(
       ephData.allEphSecretShares,
       ephData.allEphVssSchemes,
       ephData.partyIndex,
-      signingSession.signingParties,
+      signingSession.signingParties
     );
     ephSharedKeys.push(ephResult.ephSharedKey);
   }
@@ -411,7 +408,9 @@ export async function runCompleteMPCProtocol(
   }
   const firstEphData = ephShareData[firstSigningParty];
   if (!firstEphData) {
-    throw new Error(`Ephemeral share data not found for party ${firstSigningParty}`);
+    throw new Error(
+      `Ephemeral share data not found for party ${firstSigningParty}`
+    );
   }
   (coordinator as any).allEphVssSchemes = firstEphData.allEphVssSchemes;
   const firstPartyId = allPartyIds[0];
@@ -429,7 +428,7 @@ export async function runCompleteMPCProtocol(
 
   // Step 5: Compute and aggregate local signatures
   console.log(
-    "Step 5: Coordinator requests local signatures from signing parties",
+    "Step 5: Coordinator requests local signatures from signing parties"
   );
   const partyLocalSigs: Array<{ partyId: string; localSig: any }> = [];
   for (let i = 0; i < signingParties.length; i++) {
@@ -446,10 +445,7 @@ export async function runCompleteMPCProtocol(
       throw new Error(`Ephemeral shared key at index ${i} is undefined`);
     }
     console.log(`  [${partyId}] POST /api/mpc/sign/compute-local`);
-    const localSigResult = service.computeLocalSignature(
-      message,
-      ephKey,
-    );
+    const localSigResult = service.computeLocalSignature(message, ephKey);
     partyLocalSigs.push({ partyId, localSig: localSigResult.localSig });
   }
 
@@ -460,13 +456,13 @@ export async function runCompleteMPCProtocol(
   // RESULTS
   // ============================================
   console.log(
-    "┌──────────────────────────────────────────────────────────────┐",
+    "┌──────────────────────────────────────────────────────────────┐"
   );
   console.log(
-    "│ RESULTS                                                      │",
+    "│ RESULTS                                                      │"
   );
   console.log(
-    "└──────────────────────────────────────────────────────────────┘\n",
+    "└──────────────────────────────────────────────────────────────┘\n"
   );
 
   const sigR = result.signature.r || (result.signature as any).R;
@@ -479,10 +475,10 @@ export async function runCompleteMPCProtocol(
   console.log(`  s: ${sigSHex.substring(0, 32)}...`);
   console.log(`\nVerification: ${result.isValid ? "✓ VALID" : "✗ INVALID"}`);
   console.log(
-    `\nFull Signature (hex): ${result.signatureHex.substring(0, 64)}...`,
+    `\nFull Signature (hex): ${result.signatureHex.substring(0, 64)}...`
   );
   console.log(
-    `Aggregate Public Key (hex): ${result.aggregatePublicKeyHex.substring(0, 64)}...\n`,
+    `Aggregate Public Key (hex): ${result.aggregatePublicKeyHex.substring(0, 64)}...\n`
   );
 
   return result;
@@ -495,7 +491,7 @@ if (require.main === module) {
   const totalParties = args[1] ? parseInt(args[1], 10) : 3;
   const defaultSigningParties = Array.from(
     { length: threshold },
-    (_, i) => `party-${i}`,
+    (_, i) => `party-${i}`
   );
   const signingPartiesArg = args[2]
     ? args[2].split(",")

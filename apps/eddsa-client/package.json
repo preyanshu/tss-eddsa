@@ -48,7 +48,7 @@
   "license": "MIT",
   "dependencies": {
     "@solana/web3.js": "^1.98.4",
-    "multi-party-eddsa-node": "^0.3.8"
+    "multi-party-eddsa-node": "latest"
   },
   "devDependencies": {
     "@tsconfig/node18": "^18.2.4",

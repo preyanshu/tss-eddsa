@@ -34,7 +34,7 @@ export class MPCClient {
   private static _adjustThresholdForRust(userThreshold: number): number {
     if (userThreshold < 2) {
       throw new ValidationError(
-        `Threshold must be at least 2. Got ${userThreshold}. This is required because we pass t-1 to Rust, and t-1 must be >= 1.`,
+        `Threshold must be at least 2. Got ${userThreshold}. This is required because we pass t-1 to Rust, and t-1 must be >= 1.`
       );
     }
     return userThreshold - 1;
@@ -73,7 +73,7 @@ export class MPCClient {
     blindFactors: SerializableBigInt[],
     publicKeys: SerializableBigInt[],
     commitments: SerializableBigInt[],
-    _partyIndex: number,
+    _partyIndex: number
   ): ShareDistributionResult {
     // Adjust threshold for Rust: pass t-1 so that threshold=t works with t signers
     const rustThreshold = this._adjustThresholdForRust(threshold);
@@ -99,7 +99,7 @@ export class MPCClient {
       blindFactorsArray,
       publicKeysArray,
       commitmentsArray,
-      parties,
+      parties
     );
 
     // Normalize VSS structure
@@ -124,7 +124,7 @@ export class MPCClient {
     publicKeys: SerializableBigInt[],
     allSecretShares: SecretShare[][],
     allVssSchemes: VSSScheme[],
-    partyIndex: number,
+    partyIndex: number
   ): SharedKey {
     // Adjust threshold for Rust: pass t-1 so that threshold=t works with t signers
     const rustThreshold = this._adjustThresholdForRust(threshold);
@@ -136,7 +136,9 @@ export class MPCClient {
     for (let j = 0; j < shareCount; j++) {
       const share = allSecretShares[j]?.[partyIndex];
       if (!share) {
-        throw new ValidationError(`Missing secret share from party ${j} for party ${partyIndex}`);
+        throw new ValidationError(
+          `Missing secret share from party ${j} for party ${partyIndex}`
+        );
       }
       partySecretShares.push(share);
     }
@@ -160,7 +162,7 @@ export class MPCClient {
       publicKeysArray,
       partySecretSharesArray,
       allVssSchemes as any, // VSSScheme should be compatible with SerializableVerifiableSs
-      vssPartyIndex,
+      vssPartyIndex
     );
 
     return sharedKey;
@@ -191,7 +193,7 @@ export class MPCClient {
   static createEphemeralKey(
     keyId: string,
     message: Buffer | number[],
-    partyIndex: number,
+    partyIndex: number
   ): EphemeralKeyResult {
     const messageArray = Buffer.isBuffer(message)
       ? Array.from(message)
@@ -199,7 +201,7 @@ export class MPCClient {
     const ephKeyId: string = thresholdSig.ephemeralKeyCreate(
       keyId,
       messageArray,
-      partyIndex,
+      partyIndex
     );
     const ephR: SerializableBigInt = thresholdSig.getEphemeralR(ephKeyId);
     return {
@@ -212,7 +214,7 @@ export class MPCClient {
    * Step 6: Generate ephemeral commitment (Ephemeral Phase 1 Broadcast)
    */
   static generateEphemeralCommitment(
-    ephKeyId: string,
+    ephKeyId: string
   ): EphemeralCommitmentResult {
     const ephBroadcast = thresholdSig.ephemeralPhase1Broadcast(ephKeyId);
     return {
@@ -231,7 +233,7 @@ export class MPCClient {
     ephBlindFactors: SerializableBigInt[],
     ephRPoints: SerializableBigInt[],
     ephCommitments: SerializableBigInt[],
-    signingParties: number[],
+    signingParties: number[]
   ): ShareDistributionResult {
     // Adjust threshold for Rust: pass t-1 so that threshold=t works with t signers
     const rustThreshold = this._adjustThresholdForRust(threshold);
@@ -257,7 +259,7 @@ export class MPCClient {
       ephBlindFactorsArray,
       ephRPointsArray,
       ephCommitmentsArray,
-      signingPartiesVSS,
+      signingPartiesVSS
     );
 
     // Normalize VSS structure
@@ -283,7 +285,7 @@ export class MPCClient {
     allEphSecretShares: SecretShare[][],
     allEphVssSchemes: VSSScheme[],
     partyIndex: number,
-    signingParties: number[],
+    signingParties: number[]
   ): EphemeralSharedKey {
     // Adjust threshold for Rust: pass t-1 so that threshold=t works with t signers
     const rustThreshold = this._adjustThresholdForRust(threshold);
@@ -292,7 +294,7 @@ export class MPCClient {
     const signingPartyIdx = signingParties.indexOf(partyIndex);
     if (signingPartyIdx === -1) {
       throw new ValidationError(
-        `Party ${partyIndex} is not in the signing parties list`,
+        `Party ${partyIndex} is not in the signing parties list`
       );
     }
 
@@ -301,7 +303,9 @@ export class MPCClient {
     for (let j = 0; j < signingParties.length; j++) {
       const share = allEphSecretShares[j]?.[partyIndex];
       if (!share) {
-        throw new ValidationError(`Missing ephemeral secret share from party ${j} for party ${partyIndex}`);
+        throw new ValidationError(
+          `Missing ephemeral secret share from party ${j} for party ${partyIndex}`
+        );
       }
       partyEphSecretShares.push(share);
     }
@@ -325,7 +329,7 @@ export class MPCClient {
         ephRPointsArray,
         partyEphSecretSharesArray,
         allEphVssSchemes as any, // VSSScheme should be compatible with SerializableVerifiableSs
-        vssPartyIndex,
+        vssPartyIndex
       );
 
     return ephSharedKey;
@@ -337,7 +341,7 @@ export class MPCClient {
   static computeLocalSignature(
     message: Buffer | number[],
     ephSharedKey: EphemeralSharedKey,
-    sharedKey: SharedKey,
+    sharedKey: SharedKey
   ): LocalSignature {
     const messageArray = Buffer.isBuffer(message)
       ? Array.from(message)
@@ -377,7 +381,7 @@ export class MPCClient {
     const localSig: LocalSignature = thresholdSig.computeLocalSig(
       messageArray,
       ephSharedKeyRust as any,
-      sharedKeyRust as any,
+      sharedKeyRust as any
     );
     return localSig;
   }
@@ -389,7 +393,7 @@ export class MPCClient {
     localSigs: LocalSignature[],
     signingParties: number[],
     keyGenVssSchemes: VSSScheme[],
-    ephVssSchemes: VSSScheme[],
+    ephVssSchemes: VSSScheme[]
   ): any {
     // Convert to Rust-compatible format
     const localSigsRust = localSigs.map((sig) => ({
@@ -408,7 +412,7 @@ export class MPCClient {
       localSigsRust as any,
       signingParties,
       keyGenVssSchemes as any,
-      ephVssSchemes as any,
+      ephVssSchemes as any
     );
     return vssSum;
   }
@@ -420,7 +424,7 @@ export class MPCClient {
     vssSum: any,
     localSigs: LocalSignature[],
     signingParties: number[],
-    aggregateR: SerializableBigInt,
+    aggregateR: SerializableBigInt
   ): Signature {
     // Convert to Rust-compatible format
     const localSigsRust = localSigs.map((sig) => ({
@@ -444,7 +448,7 @@ export class MPCClient {
       vssSum,
       localSigsRust as any,
       signingParties,
-      aggregateRRust,
+      aggregateRRust
     );
     return signature;
   }
@@ -455,7 +459,7 @@ export class MPCClient {
   static verifySignature(
     signature: Signature,
     message: Buffer | number[],
-    aggregatePublicKey: PublicKey,
+    aggregatePublicKey: PublicKey
   ): boolean {
     const messageArray = Buffer.isBuffer(message)
       ? Array.from(message)
@@ -481,7 +485,7 @@ export class MPCClient {
     const isValid: boolean = thresholdSig.verifySignature(
       signatureRust as any,
       messageArray,
-      aggregatePublicKeyRust,
+      aggregatePublicKeyRust
     );
     return isValid;
   }

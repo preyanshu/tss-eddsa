@@ -34,27 +34,35 @@ This monorepo implements a distributed threshold EdDSA (Ed25519) signature schem
 ### Package Descriptions
 
 #### `eddsa-core` (Rust)
+
 The core cryptographic implementation written in Rust. Implements:
+
 - Threshold EdDSA signature scheme
 - Distributed key generation (DKG)
 - Verifiable secret sharing (VSS)
 - Signature aggregation
 
 #### `eddsa-bindings` (NAPI-RS)
+
 Node.js native bindings built with NAPI-RS that expose the Rust core functionality to JavaScript/TypeScript. Provides low-level access to:
+
 - Key generation phases
 - Ephemeral key operations
 - Signature computation and verification
 
 #### `eddsa-client` (TypeScript)
+
 High-level TypeScript client library providing:
+
 - `MPCService`: Service for individual parties
 - `CoordinatorService`: Service for orchestrating the protocol
 - `MPCClient`: Low-level client for direct MPC operations
 - Full TypeScript types and error handling
 
 #### `eddsa-examples` (TypeScript)
+
 Example implementations demonstrating:
+
 - Complete MPC protocol flow
 - Solana transaction signing with MPC
 
@@ -99,6 +107,7 @@ bun run build --filter=eddsa-core
 ```
 
 **What it does:**
+
 - Compiles TypeScript to JavaScript (`eddsa-client`)
 - Builds native Node.js bindings (`eddsa-bindings`)
 - Compiles Rust library (`eddsa-core`)
@@ -121,6 +130,7 @@ cd apps/eddsa-client && bun run test:coverage
 ```
 
 **What it does:**
+
 - Runs Jest test suites
 - Ensures dependencies are built before testing
 - Generates coverage reports
@@ -139,6 +149,7 @@ bun run format
 ```
 
 **What it does:**
+
 - `lint`: Runs ESLint on all packages
 - `check-types`: Type checks TypeScript without emitting files
 - `format`: Formats code using Prettier
@@ -154,6 +165,7 @@ cd apps/eddsa-client && bun run watch
 ```
 
 **What it does:**
+
 - Watches for file changes and rebuilds automatically
 - Useful for active development
 
@@ -165,6 +177,7 @@ bun run clean
 ```
 
 **What it does:**
+
 - Removes `dist/` directories (TypeScript output)
 - Removes `target/` directories (Rust build artifacts)
 - Removes `node_modules` from root and all apps
@@ -214,11 +227,13 @@ bun run example:mpc
 ### Working on the TypeScript Client
 
 1. Navigate to the client package:
+
    ```bash
    cd apps/eddsa-client
    ```
 
 2. Start watch mode:
+
    ```bash
    bun run watch
    ```
@@ -233,11 +248,13 @@ bun run example:mpc
 ### Working on Native Bindings
 
 1. Navigate to the bindings package:
+
    ```bash
    cd apps/eddsa-bindings
    ```
 
 2. Build in debug mode:
+
    ```bash
    bun run build:debug
    ```
@@ -250,11 +267,13 @@ bun run example:mpc
 ### Working on Rust Core
 
 1. Navigate to the core package:
+
    ```bash
    cd apps/eddsa-core
    ```
 
 2. Run Rust tests:
+
    ```bash
    cargo test
    ```
@@ -267,6 +286,7 @@ bun run example:mpc
 ## Turborepo Configuration
 
 This monorepo uses [Turborepo](https://turbo.build/) for:
+
 - **Task Orchestration**: Runs tasks in the correct dependency order
 - **Build Caching**: Caches build outputs for faster rebuilds
 - **Parallel Execution**: Runs independent tasks in parallel
@@ -275,6 +295,7 @@ This monorepo uses [Turborepo](https://turbo.build/) for:
 ### Task Dependencies
 
 Tasks are configured in `turbo.json`:
+
 - `build`: Depends on `^build` (build dependencies first)
 - `test`: Depends on `^build` (build before testing)
 - `lint`: Depends on `^lint` (lint dependencies first)
@@ -307,11 +328,11 @@ npm install multi-party-eddsa
 Basic usage:
 
 ```typescript
-import { MPCService, CoordinatorService } from 'multi-party-eddsa';
+import { MPCService, CoordinatorService } from "multi-party-eddsa";
 
 // Initialize services
-const party0 = new MPCService('party-0');
-const party1 = new MPCService('party-1');
+const party0 = new MPCService("party-0");
+const party1 = new MPCService("party-1");
 const coordinator = new CoordinatorService();
 
 // Start key generation (2-of-3 threshold)
@@ -326,7 +347,7 @@ coordinator.startKeyGeneration(2, 3);
 The native bindings are used internally by the client library. For direct access:
 
 ```typescript
-import * as thresholdSigModule from 'multi-party-eddsa-node';
+import * as thresholdSigModule from "multi-party-eddsa-node";
 
 const thresholdSig = thresholdSigModule.threshold_sig;
 // Use low-level functions...
@@ -379,16 +400,19 @@ cd apps/eddsa-client && bun run test:coverage
 ### Build Issues
 
 **Problem**: Native bindings fail to build
+
 - **Solution**: Ensure Rust is installed (`rustc --version`)
 - **Solution**: Ensure `@napi-rs/cli` is installed
 
 **Problem**: TypeScript compilation errors
+
 - **Solution**: Run `bun run check-types` to see all errors
 - **Solution**: Ensure all dependencies are installed
 
 ### Runtime Issues
 
 **Problem**: Cannot find native bindings module
+
 - **Solution**: Ensure `eddsa-bindings` is built: `bun run build --filter=eddsa-bindings`
 - **Solution**: Check that `*.node` files are present in `eddsa-bindings/`
 
@@ -409,6 +433,7 @@ cd apps/eddsa-client && bun run test:coverage
 ## Support
 
 For issues, questions, or contributions:
+
 - Open an issue on GitHub
 - Check existing documentation in package READMEs
 - Review example implementations in `apps/eddsa-examples/`

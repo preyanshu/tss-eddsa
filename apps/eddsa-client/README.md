@@ -116,11 +116,13 @@ new MPCService(partyId: string)
 ```
 
 **Parameters:**
+
 - `partyId` (string): Unique identifier for this party (e.g., "party-0")
 
 **Example:**
+
 ```typescript
-const service = new MPCService('party-0');
+const service = new MPCService("party-0");
 ```
 
 #### Methods
@@ -130,16 +132,18 @@ const service = new MPCService('party-0');
 Registers the party and generates initial public key for key generation.
 
 **Returns:**
+
 ```typescript
 {
-  publicKey: SerializableBigInt
+  publicKey: SerializableBigInt;
 }
 ```
 
 **Example:**
+
 ```typescript
 const result = service.register();
-console.log('Public Key:', result.publicKey);
+console.log("Public Key:", result.publicKey);
 ```
 
 ##### `generateCommitment()`
@@ -147,6 +151,7 @@ console.log('Public Key:', result.publicKey);
 Generates a commitment for the key generation phase. Commitments ensure parties cannot cheat during share distribution.
 
 **Returns:**
+
 ```typescript
 {
   commitment: SerializableBigInt,
@@ -155,6 +160,7 @@ Generates a commitment for the key generation phase. Commitments ensure parties 
 ```
 
 **Example:**
+
 ```typescript
 const result = service.generateCommitment();
 // Send commitment and blindFactor to coordinator
@@ -165,6 +171,7 @@ const result = service.generateCommitment();
 Distributes secret shares to all parties using Verifiable Secret Sharing (VSS).
 
 **Parameters:**
+
 - `threshold` (number): Minimum parties needed to sign
 - `shareCount` (number): Total number of parties
 - `blindFactors` (SerializableBigInt[]): Blind factors from all parties
@@ -173,6 +180,7 @@ Distributes secret shares to all parties using Verifiable Secret Sharing (VSS).
 - `partyIndex` (number): This party's index (0-based)
 
 **Returns:**
+
 ```typescript
 {
   vss: VSSScheme,
@@ -181,14 +189,15 @@ Distributes secret shares to all parties using Verifiable Secret Sharing (VSS).
 ```
 
 **Example:**
+
 ```typescript
 const result = service.distributeShares(
-  2,  // threshold
-  3,  // total parties
+  2, // threshold
+  3, // total parties
   blindFactors,
   publicKeys,
   commitments,
-  0   // this party's index
+  0 // this party's index
 );
 ```
 
@@ -197,6 +206,7 @@ const result = service.distributeShares(
 Constructs the shared keypair from collected shares.
 
 **Parameters:**
+
 - `threshold` (number): Minimum parties needed to sign
 - `shareCount` (number): Total number of parties
 - `publicKeys` (PublicKey[]): Public keys from all parties
@@ -205,21 +215,23 @@ Constructs the shared keypair from collected shares.
 - `partyIndex` (number): This party's index
 
 **Returns:**
+
 ```typescript
 {
-  sharedKey: SharedKey
+  sharedKey: SharedKey;
 }
 ```
 
 **Example:**
+
 ```typescript
 const result = service.constructKeypair(
-  2,  // threshold
-  3,  // total parties
+  2, // threshold
+  3, // total parties
   publicKeys,
   allSecretShares,
   allVssSchemes,
-  0   // this party's index
+  0 // this party's index
 );
 ```
 
@@ -228,10 +240,12 @@ const result = service.constructKeypair(
 Starts ephemeral key generation for signing. Ephemeral keys are one-time keys used only for a single signature.
 
 **Parameters:**
+
 - `message` (Buffer): Message to sign
 - `partyIndex` (number): This party's index
 
 **Returns:**
+
 ```typescript
 {
   ephR: SerializableBigInt,
@@ -242,8 +256,9 @@ Starts ephemeral key generation for signing. Ephemeral keys are one-time keys us
 ```
 
 **Example:**
+
 ```typescript
-const message = Buffer.from('Hello, World!');
+const message = Buffer.from("Hello, World!");
 const result = service.startEphemeralKeyGeneration(message, 0);
 ```
 
@@ -252,6 +267,7 @@ const result = service.startEphemeralKeyGeneration(message, 0);
 Distributes ephemeral shares for signing.
 
 **Parameters:**
+
 - `ephKeyId` (string): Ephemeral key ID from `startEphemeralKeyGeneration`
 - `threshold` (number): Minimum parties needed to sign
 - `shareCount` (number): Total number of parties
@@ -261,6 +277,7 @@ Distributes ephemeral shares for signing.
 - `signingParties` (number[]): Indices of parties participating in signing
 
 **Returns:**
+
 ```typescript
 {
   vss: VSSScheme,
@@ -273,6 +290,7 @@ Distributes ephemeral shares for signing.
 Constructs ephemeral keypair for signing.
 
 **Parameters:**
+
 - `ephKeyId` (string): Ephemeral key ID
 - `threshold` (number): Minimum parties needed to sign
 - `shareCount` (number): Total number of parties
@@ -283,9 +301,10 @@ Constructs ephemeral keypair for signing.
 - `signingParties` (number[]): Indices of signing parties
 
 **Returns:**
+
 ```typescript
 {
-  ephSharedKey: EphemeralSharedKey
+  ephSharedKey: EphemeralSharedKey;
 }
 ```
 
@@ -294,17 +313,20 @@ Constructs ephemeral keypair for signing.
 Computes local signature component. These are aggregated by the coordinator to form the final signature.
 
 **Parameters:**
+
 - `message` (Buffer): Message to sign
 - `ephSharedKey` (EphemeralSharedKey): Ephemeral shared key from `constructEphemeralKeypair`
 
 **Returns:**
+
 ```typescript
 {
-  localSig: LocalSignature
+  localSig: LocalSignature;
 }
 ```
 
 **Example:**
+
 ```typescript
 const result = service.computeLocalSignature(message, ephSharedKey);
 // Send localSig to coordinator for aggregation
@@ -317,10 +339,11 @@ Service that orchestrates the MPC protocol across all parties.
 #### Constructor
 
 ```typescript
-new CoordinatorService()
+new CoordinatorService();
 ```
 
 **Example:**
+
 ```typescript
 const coordinator = new CoordinatorService();
 ```
@@ -332,10 +355,12 @@ const coordinator = new CoordinatorService();
 Starts a key generation session.
 
 **Parameters:**
+
 - `threshold` (number): Minimum parties needed to sign (must be >= 2)
 - `totalParties` (number): Total number of parties (must be >= threshold)
 
 **Example:**
+
 ```typescript
 coordinator.startKeyGeneration(2, 3); // 2-of-3 threshold
 ```
@@ -345,10 +370,12 @@ coordinator.startKeyGeneration(2, 3); // 2-of-3 threshold
 Registers a party in the key generation session.
 
 **Parameters:**
+
 - `partyId` (string): Unique identifier for the party
 - `publicKey` (PublicKey): Public key from party's `register()` call
 
 **Returns:**
+
 ```typescript
 {
   partyId: string,
@@ -357,9 +384,10 @@ Registers a party in the key generation session.
 ```
 
 **Example:**
+
 ```typescript
-const result = coordinator.registerParty('party-0', publicKey);
-console.log('Party index:', result.partyIndex);
+const result = coordinator.registerParty("party-0", publicKey);
+console.log("Party index:", result.partyIndex);
 ```
 
 ##### `collectCommitments(partyCommitments)`
@@ -367,9 +395,11 @@ console.log('Party index:', result.partyIndex);
 Collects commitments from all parties.
 
 **Parameters:**
+
 - `partyCommitments` (Array): Array of commitment objects from each party
 
 **Returns:**
+
 ```typescript
 {
   threshold: number,
@@ -382,11 +412,24 @@ Collects commitments from all parties.
 ```
 
 **Example:**
+
 ```typescript
 const result = coordinator.collectCommitments([
-  { partyId: 'party-0', commitment: commit0.commitment, blindFactor: commit0.blindFactor },
-  { partyId: 'party-1', commitment: commit1.commitment, blindFactor: commit1.blindFactor },
-  { partyId: 'party-2', commitment: commit2.commitment, blindFactor: commit2.blindFactor },
+  {
+    partyId: "party-0",
+    commitment: commit0.commitment,
+    blindFactor: commit0.blindFactor,
+  },
+  {
+    partyId: "party-1",
+    commitment: commit1.commitment,
+    blindFactor: commit1.blindFactor,
+  },
+  {
+    partyId: "party-2",
+    commitment: commit2.commitment,
+    blindFactor: commit2.blindFactor,
+  },
 ]);
 ```
 
@@ -395,9 +438,11 @@ const result = coordinator.collectCommitments([
 Collects secret shares from all parties.
 
 **Parameters:**
+
 - `partyShares` (Array): Array of share objects from each party
 
 **Returns:**
+
 ```typescript
 {
   [partyId: string]: {
@@ -412,11 +457,12 @@ Collects secret shares from all parties.
 ```
 
 **Example:**
+
 ```typescript
 const result = coordinator.collectShares([
-  { partyId: 'party-0', vss: vss0, secretShares: shares0 },
-  { partyId: 'party-1', vss: vss1, secretShares: shares1 },
-  { partyId: 'party-2', vss: vss2, secretShares: shares2 },
+  { partyId: "party-0", vss: vss0, secretShares: shares0 },
+  { partyId: "party-1", vss: vss1, secretShares: shares1 },
+  { partyId: "party-2", vss: vss2, secretShares: shares2 },
 ]);
 ```
 
@@ -425,23 +471,26 @@ const result = coordinator.collectShares([
 Collects shared keys and computes aggregate public key.
 
 **Parameters:**
+
 - `partySharedKeys` (Array): Array of shared key objects from each party
 
 **Returns:**
+
 ```typescript
 {
-  aggregatePublicKey: PublicKey
+  aggregatePublicKey: PublicKey;
 }
 ```
 
 **Example:**
+
 ```typescript
 const result = coordinator.collectSharedKeys([
-  { partyId: 'party-0', sharedKey: key0.sharedKey },
-  { partyId: 'party-1', sharedKey: key1.sharedKey },
-  { partyId: 'party-2', sharedKey: key2.sharedKey },
+  { partyId: "party-0", sharedKey: key0.sharedKey },
+  { partyId: "party-1", sharedKey: key1.sharedKey },
+  { partyId: "party-2", sharedKey: key2.sharedKey },
 ]);
-console.log('Aggregate Public Key:', result.aggregatePublicKey);
+console.log("Aggregate Public Key:", result.aggregatePublicKey);
 ```
 
 ##### `startSigning(message, signingParties)`
@@ -449,10 +498,12 @@ console.log('Aggregate Public Key:', result.aggregatePublicKey);
 Starts a signing session.
 
 **Parameters:**
+
 - `message` (Buffer): Message to sign
 - `signingParties` (string[]): Array of party IDs that will participate in signing
 
 **Returns:**
+
 ```typescript
 {
   signingParties: number[]
@@ -460,9 +511,10 @@ Starts a signing session.
 ```
 
 **Example:**
+
 ```typescript
-const message = Buffer.from('Hello, World!');
-const session = coordinator.startSigning(message, ['party-0', 'party-1']);
+const message = Buffer.from("Hello, World!");
+const session = coordinator.startSigning(message, ["party-0", "party-1"]);
 ```
 
 ##### `collectEphemeralKeysAndCommitments(partyEphData)`
@@ -470,9 +522,11 @@ const session = coordinator.startSigning(message, ['party-0', 'party-1']);
 Collects ephemeral keys and commitments from signing parties.
 
 **Parameters:**
+
 - `partyEphData` (Array): Array of ephemeral key data from each signing party
 
 **Returns:**
+
 ```typescript
 {
   ephBlindFactors: SerializableBigInt[],
@@ -486,9 +540,11 @@ Collects ephemeral keys and commitments from signing parties.
 Collects ephemeral shares from signing parties.
 
 **Parameters:**
+
 - `partyEphShares` (Array): Array of ephemeral share data from each signing party
 
 **Returns:**
+
 ```typescript
 {
   [partyId: string]: {
@@ -504,9 +560,11 @@ Collects ephemeral shares from signing parties.
 Collects local signatures and aggregates them into the final signature.
 
 **Parameters:**
+
 - `partyLocalSigs` (Array): Array of local signature objects from each signing party
 
 **Returns:**
+
 ```typescript
 {
   signature: Signature,
@@ -515,16 +573,17 @@ Collects local signatures and aggregates them into the final signature.
 ```
 
 **Example:**
+
 ```typescript
 const result = coordinator.collectLocalSignatures([
-  { partyId: 'party-0', localSig: localSig0 },
-  { partyId: 'party-1', localSig: localSig1 },
+  { partyId: "party-0", localSig: localSig0 },
+  { partyId: "party-1", localSig: localSig1 },
 ]);
 
 if (result.isValid) {
-  console.log('Signature is valid!');
-  console.log('R:', result.signature.r);
-  console.log('s:', result.signature.s);
+  console.log("Signature is valid!");
+  console.log("R:", result.signature.r);
+  console.log("s:", result.signature.s);
 }
 ```
 
@@ -582,7 +641,7 @@ import {
   LocalSignature,
   SerializableBigInt,
   // ... and more
-} from 'multi-party-eddsa';
+} from "multi-party-eddsa";
 ```
 
 ## Error Handling
@@ -594,8 +653,8 @@ import {
   ValidationError,
   PartyError,
   StateError,
-  ProtocolError
-} from 'multi-party-eddsa';
+  ProtocolError,
+} from "multi-party-eddsa";
 
 try {
   // ... MPC operations
@@ -621,8 +680,8 @@ See the [Solana Transaction POC example](../../eddsa-examples/examples/solana_tr
 Solana uses Ed25519 signatures in a 64-byte format: `R (32 bytes) + s (32 bytes)`
 
 ```typescript
-import { MPCService, CoordinatorService } from 'multi-party-eddsa';
-import { Transaction, PublicKey } from '@solana/web3.js';
+import { MPCService, CoordinatorService } from "multi-party-eddsa";
+import { Transaction, PublicKey } from "@solana/web3.js";
 
 // After getting MPC signature from coordinator.collectLocalSignatures()
 const mpcSignature = result.signature;
