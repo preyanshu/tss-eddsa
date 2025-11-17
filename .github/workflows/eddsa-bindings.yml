@@ -80,12 +80,14 @@ jobs:
         if: startsWith(matrix.os, 'windows')
         shell: pwsh
         run: |
-          git clone https://github.com/microsoft/vcpkg --depth=1 C:\vcpkg
-          cd C:\vcpkg
-          .\bootstrap-vcpkg.bat
-          .\vcpkg install gmp:x64-windows-static
-          echo "GMP_LIB_DIR=C:\vcpkg\installed\x64-windows-static\lib" >> $env:GITHUB_ENV
-          echo "GMP_INCLUDE_DIR=C:\vcpkg\installed\x64-windows-static\include" >> $env:GITHUB_ENV
+          if (!(Test-Path "C:\vcpkg")) {
+            git clone https://github.com/microsoft/vcpkg C:\vcpkg --depth=1
+            cd C:\vcpkg
+            .\bootstrap-vcpkg.bat
+          }
+          C:\vcpkg\vcpkg install gmp:x64-windows-static
+          "GMP_LIB_DIR=C:/vcpkg/installed/x64-windows-static/lib" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "GMP_INCLUDE_DIR=C:/vcpkg/installed/x64-windows-static/include" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Cache cargo build
         uses: Swatinem/rust-cache@v2
