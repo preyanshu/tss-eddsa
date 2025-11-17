@@ -2,6 +2,8 @@
 
 A high-level TypeScript client library for implementing threshold EdDSA (Ed25519) signatures using Multi-Party Computation (MPC). This library enables distributed key generation and threshold signing where multiple parties must collaborate to create a signature, without any single party ever having access to the complete private key.
 
+This package lives inside the [`tss-eddsa` Turborepo](https://github.com/preyanshu/tss-eddsa) and is the client foundation for Zengox’s MPC-backed EdDSA signing flows. For more end-to-end flows, explore the [examples workspace](https://github.com/preyanshu/tss-eddsa/tree/main/apps/eddsa-examples).
+
 ## Installation
 
 ```bash
