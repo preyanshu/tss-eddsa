@@ -1,6 +1,6 @@
 {
   "name": "multi-party-eddsa",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Multi-Party EdDSA threshold signature library",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
