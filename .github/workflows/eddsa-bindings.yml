@@ -83,12 +83,9 @@ jobs:
           choco install msys2 -y
           refreshenv
           C:\tools\msys64\usr\bin\bash -lc "pacman -Sy --noconfirm --needed mingw-w64-x86_64-gmp"
-          $libDir = "C:\tools\msys64\mingw64\lib"
-          $binDir = "C:\tools\msys64\mingw64\bin"
-          Copy-Item "$binDir\libgmp-10.dll" "$libDir\libgmp-10.dll" -Force
-          C:\tools\msys64\usr\bin\gendef.exe "$binDir\libgmp-10.dll"
-          lib /machine:x64 /def:libgmp-10.def /out:"$libDir\gmp.lib"
-          echo "LIB=$libDir;$env:LIB" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "GMP_LIB_DIR=C:\tools\msys64\mingw64\lib" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "GMP_INCLUDE_DIR=C:\tools\msys64\mingw64\include" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "LIB=C:\tools\msys64\mingw64\lib;$env:LIB" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           echo "INCLUDE=C:\tools\msys64\mingw64\include;$env:INCLUDE" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Cache cargo build
